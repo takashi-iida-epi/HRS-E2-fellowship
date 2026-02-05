@@ -1,0 +1,88 @@
+---
+title: "Analysis"
+author: "Takashi Iida"
+date: today
+format: html
+html-table-processing: none
+---
+## Overview
+
+This document creates tables and figures for the manuscript.
+
+## Setup
+
+```{r}
+#| label: setup
+#| message: false
+
+
+library(tidyverse)
+library(haven)
+```
+
+## Load clean data  
+
+```{r}
+# data import
+# install.packages("haven")
+
+
+getwd()
+
+base_directory <- "/Users/iidatakashi/Documents/Git/HRS-E2-fellowship/data"
+
+setwd(base_directory)
+
+dat <- read_sas("randhrs1992_2022v1.sas7bdat")
+
+```
+
+## Overall data exploration
+
+```{r}
+#| label: overall-exploration
+#| echo: true
+#| message: false
+
+
+head(dat)
+dim(dat)  # n. of observation and n. of variables
+nrow(dat) #observation
+ncol(dat) #variables
+names(dat) # names of variables
+```
+
+
+## Exposure exploration
+
+- Exposure is Ongoing housing problems. 
+- Identifier is HOUSEPRB in the colmun names. 
+
+
+```{r}
+#| label: exposure-exploration
+#| echo: false
+
+
+## Ongoing housing preoblems: Categorical variables
+table(dat$R8LBHOUSEPRB, useNA = "ifany") # one example among several waves
+prop.table(table(dat$R8LBHOUSEPRB))
+
+# check cols for Ongoing housing preoblems
+dat %>% select(contains("HOUSEPRB"))
+
+# Number of completed interviews per wave
+colSums(!is.na(dat %>% select(contains("HOUSEPRB"))))
+
+# Total number of completed interviews (all waves combined)
+sum(dat %>% select(contains("HOUSEPRB")), na.rm = TRUE)
+
+# integrate into vector
+all_house_values <- unlist(dat %>% select(contains("HOUSEPRB")))
+
+# distribution
+table(all_house_values, useNA = "ifany")
+
+# proportion
+prop.table(table(all_house_values))
+```

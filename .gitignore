@@ -1,0 +1,6 @@
+data/
+*.sas7bdat
+*.rds
+*.csv
+randhrs*
+sasfmts*

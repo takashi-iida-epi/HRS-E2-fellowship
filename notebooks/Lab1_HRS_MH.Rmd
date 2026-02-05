@@ -1,0 +1,214 @@
+---
+title: "Lab 1: Downloading and Exploration of the HRS Dataset"
+---
+
+In this course, we will use R to explore data from the Health and Retirement Study (HRS) cohort. We will begin by downloading the data and then conduct an initial exploration of the dataset in order to start the data cleaning and management process.
+
+The objectives of this guide are as follows: Download the HRS data Explore the HRS data Clean our dataset Save the dataset for data analysis\
+
+# 1.0 Downloading HRS Data
+
+The first step is to access the following link to obtain the public data from the [Health and Retirement Study](https://hrsdata.isr.umich.edu/data-products/public-survey-data) (HRS). If you do not have an account, you will need to create one by following the instructions on the [website](https://hrsdata.isr.umich.edu/data-products?_gl=1*4kpg8w*_ga*NjgzNTE4ODg4LjE3Njc0Nzk4MTk.*_ga_FF28MW3MW2*czE3NjgwNjIyNDUkbzUkZzEkdDE3NjgwNjMyNDIkajYwJGwwJGgw). Once logged in, go to the section titled "[RAND HRS Products](https://hrsdata.isr.umich.edu/data-products/rand)“. Then, from "Longitudinal and Cross-Wave Data Products” and select the dataset “[RAND HRS Longitudinal File 2022](https://hrsdata.isr.umich.edu/data-products/rand-hrs-longitudinal-file-2022)”. Download the SAS version "**randhrs1992_2022v1_SAS**"
+
+[**Alternative:**]{.underline}
+
+If the variables you are interested in not in the "RAND HRS Longitudinal File 2022", you can download "[RAND HRS Fat File](https://hrsdata.isr.umich.edu/data-products/rand)" . It is single-wave file which contains nearly all variables from the HRS core. However, it did not harmonize variables across the waves. Download the SAS version of the waves you need (e.g "h18f2c_SAS")
+
+## 1.1 Data Storage
+
+We recommend creating a folder where you will store your project, which will serve as your main working directory in RStudio. Inside this folder, you can have your project along with three additional folders:
+
+1.  01_data, where you will store the datasets downloaded directly from the HRS website
+
+2.  02_R, where all R scripts and code will be stored; and
+
+3.  03_output, where you will save figures, tables, or any files generated from the labs.
+
+Within the 01_data folder, you will have two subfolders:, ***1.1 raw_data*** , where you will store the datasets downloaded directly from the HRS website, and **1.2 temporary datasets**, where you will save datasets that have been processed but are not yet final. This way, if you need to review or redo any steps, you will not need to rerun all of your code.
+
+Extract the downloaded data into the 1.1 raw_data folder.
+
+## 1.2 Creating the Project
+
+1.  Open RStudio and go to the *File tab*, then select the *New Project* option.
+
+![](images/New_project_1.jpg)\
+
+2.  Select the *Existing Directory* option and locate the path to your folder, the one that contains the subfolders 01_data, 02_R, and 03_output, and create your project there.
+
+3.  Once finished, it should look like the following.
+
+    ![](images/step_2-01.jpg)
+
+After all folders are properly organized, we can begin our work.\
+
+# 2.0 Data Exploration
+
+## 2.1 Installing and Loading Working Libraries
+
+\
+Once the project is open, we will begin with data exploration. Create a new script and start by adding your title, date, and the name of the person preparing the script. Remember that in R, to add comments you must use the \# symbol before the sentence so it is not interpreted as part of the code.\
+The first step in R is always to load the libraries we will use. To avoid issues in case a library is not installed, we can use the following code, which first checks whether the library is installed, installs it if needed, and then loads it.\
+
+```{r, warning=FALSE}
+libs <- c("haven", "tidyverse")
+
+for (pkg in libs) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+}
+
+library(haven)
+library(tidyverse)
+
+rm(list = ls())
+
+```
+
+\
+For this exercise, we will use the *haven* library, which allows us to read datasets created in other software such as Stata, SAS, and SPSS. We will also use the *tidyverse collection* of packages, which enables us to import, visualize, clean, and analyze data.\
+
+## 2.2 Extract the dataset and set the directory
+
+The data will be downloaded in compressed formate, so you will need to extract it. The extracted folder will give you three files:
+
+1.  randhrs1992_2022v1.pdf (codebook)
+2.  randhrs1992_2022v1.sas7bdat (main dataset)
+3.  sasfmts.sas7bdat (SAS format file)
+
+We can use the following code in the console to identify the path where our project is located:
+
+```{r}
+getwd()
+```
+
+Next, we can take that path and add the remaining sections needed to reach our dataset, which would be your path plus *"/01_data/1.1_raw_data/COGIMP9220A_R"*, and then load the dataset.
+
+```{r}
+hrs_db <- read_dta("C:/Users/Mchivard/Desktop/Trabajo/Administrativo/Pagina web RMarkdown/Lab_x/01_data/1.1_raw_data/COGIMP9220A_R.dta")
+
+```
+
+**Alternative methods:**
+
+We can set our directory to the path where the data is located. In these case we will not need to repeat the path in the remaining sections.
+
+1)  Copy the path to your .sasbdatfile. You can do this by going to the folder it is in, right-clicking the file, and press copy as path.
+2)  Use the following code to import the dataset. In the quotation marks meant for the path, insert the path to your file. You have to make sure that your location is divided by double backslash or forward back slashes, rather than a single backslash
+
+```{r}
+base_directory <- "Path"
+setwd("path")
+```
+
+*Note*: To make your coding easier, try to give your objects short names, always use lowercase letters, and follow a snake_case structure.\
+In your Global Environment, you should now have an object with 41,041 observations and 561 variables.\
+*imagen consola*\
+
+## 2.3 Import the .sas7bdat file
+
+We need to import, read our dataset "randhrs1992_2022v1.sas7bdat" and give it name "data"
+
+```{r}
+data <-read_sas("path_to_file/your_file.sas7bdat")
+```
+
+It contains 45234 observations with 19880 variables
+
+## 2.4 Explore dataset
+
+You can use the codebook "randhrs1992_2022v1.pdf" to explore the dataset variables. Also, through R you can explore your data by the following codes:
+
+```{r}
+dim(data)  # n. of observation n. of variables
+nrow(data) #observation
+ncol(data) #variables
+names(data) # names of variables
+```
+
+# 3.0 Merging datasets (if required)
+
+## 3.1 Merge two or more fat files
+
+Load data
+
+```{r}
+# We will give eaxample for two waves 2016 and 2018
+fat2016 <- read_dta("randhrs2016_fat.dta")
+fat2018 <- read_dta("randhrs2018_fat.dta")
+```
+
+Keep only variables you need
+
+```{r}
+fat2016_small <- fat2016 %>%
+  select(
+    HHIDPN,
+    "variable1",     
+    "variable2"
+  ) %>%
+  mutate(
+    wave = 15,
+    year = 2016
+  )
+
+fat2018_small <- fat2018 %>%
+  select(
+    HHIDPN,
+    "varable1",
+    "variable2"
+  ) %>%
+  mutate(
+    wave = 16,
+    year = 2018
+  )
+```
+
+Merge the two subdatasets
+
+```{r}
+fat_2016_2018 <- bind_rows(fat2016_small, fat2018_small)
+```
+
+Note: Raw fat variables are different across the waves. Make sure that you harmonize the variables' names across the waves.
+
+## 3.2 Merge Fat file to the longitudinal file
+
+Load the data
+
+```{r}
+# We will give eaxample for RAND longitudinal file and waves 2022 RAND fat file
+rand_long <- read_dta("randhrs_long.dta")
+fat2022   <- read_dta("randhrs2022_fat.dta")
+```
+
+Prepare the Fat file
+
+```{r}
+# Keep only variables you need
+fat2022_small <- fat2022 %>%
+  select(
+    HHIDPN,
+    "variable1",      
+    "variable2"
+  ) %>%
+  mutate(
+    wave = 16,   # Correct for RAND longitudinal file 2022
+    )
+```
+
+Prepare RAND long file (long format of the RAND longitudinal file)
+
+```{r}
+rand_long %>%
+  count(HHIDPN, wave) %>%
+  filter(n > 1)
+```
+
+Merge (LEFT JOIN)
+
+```{r}
+merged_data <- rand_long %>%
+  left_join(fat2022_small, by = c("HHIDPN", "wave"))
+```
