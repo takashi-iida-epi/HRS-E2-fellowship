@@ -6,7 +6,6 @@ format:
   docx: default
 ---
 
-
 ## Abstract
 
 **Background:**
@@ -17,108 +16,48 @@ format:
 
 **Conclusions:**
 
-
 ## Introduction
 
 ### hypothesis
-we hypothesize that greater housing stress will be associated with accelerated cognitive decline across multiple domains. Furthermore, I expect housing stress to differentially affect specific cognitive domains, though the pattern of domain-specific effects will be explored.
 
+-   we hypothesize that greater housing stress will be associated with accelerated cognitive decline across multiple domains.
 
+-   Furthermore, I expect housing stress to differentially affect specific cognitive domains, though the pattern of domain-specific effects will be explored.
 
 ### Pragraph 1
-(Why does the issue matter?)
-the number of people who encounter housing instability
-effect measure modification
+
+-   (Why does the issue matter?)
+
+    -   the number of people who encounter housing instability effect measure modification
 
 ### Pragraph 2
-(what do we know about the issue?)
-existing studies suggest association between housing stress and cognitive functioning such as executive function (EF) skills (Vaid, 2024)
 
-Introduction
+-   (what do we know about the issue?)
 
-hypothesis
-we hypothesize that greater housing stress will be associated with accelerated cognitive decline across multiple domains. Furthermore, I expect housing stress to differentially affect specific cognitive domains, though the pattern of domain-specific effects will be explored.
-
-
-
-Pragraph 1
-(Why does the issue matter?)
-the number of people who encounter housing instability
-effect measure modification
-
-Pragraph 2
-(what do we know about the issue?)
-existing studies suggest association between housing stress and cognitive functioning such as executive function (EF) skills (Vaid, 2024)
-
-
-
-Pragraph 3
-(what do we not know about the issue?)
-​​few have investigated detailed cognitive assessments such as immediate and delayed word recall, serial subtraction, and object naming tasks.
-(how studying the exposure of interest could shed light on potential interventions that could help reduce the risk of the outcome. )
-These specific cognitive measures are critical as they can be early markers for Alzheimer's disease and dementia (Na Chiangmai et al., 2025).
-
-Pragraph 4
-How does this paper address what we do not know?
-This research addresses this gap by examining the longitudinal relationship between housing stress and multiple cognitive domains using HRS data.
-(what is your research question)
-
-
-
-
+    -   existing studies suggest association between housing stress and cognitive functioning such as executive function (EF) skills (Vaid, 2024)
 
 ### Pragraph 3
-(what do we not know about the issue?)
-​​few have investigated detailed cognitive assessments such as immediate and delayed word recall, serial subtraction, and object naming tasks.
-(how studying the exposure of interest could shed light on potential interventions that could help reduce the risk of the outcome. )
-These specific cognitive measures are critical as they can be early markers for Alzheimer's disease and dementia (Na Chiangmai et al., 2025).
+
+-   (what do we not know about the issue?) ​​few have investigated detailed cognitive assessments such as immediate and delayed word recall, serial subtraction, and object naming tasks.
+
+-   (how studying the exposure of interest could shed light on potential interventions that could help reduce the risk of the outcome. )
+
+-   These specific cognitive measures are critical as they can be early markers for Alzheimer's disease and dementia (Na Chiangmai et al., 2025).
 
 ### Pragraph 4
-How does this paper address what we do not know?
-This research addresses this gap by examining the longitudinal relationship between housing stress and multiple cognitive domains using HRS data.
-(what is your research question)
 
+-   How does this paper address what we do not know?
+
+-   This research addresses this gap by examining the longitudinal relationship between housing stress and multiple cognitive domains using HRS data.
+
+<!-- -->
+
+-   (what is your research question)
 
 ::: {.callout-note collapse="true"}
 ## I need to check citation papers
 
-- I did not complete citation cocllections. 
+-   I did not complete citation cocllections.
+
+## 
 :::
-
-
-
-
-## Methods
-
-
-
-### Study Population
-
-
-
-### Statistical Analysis
-
-
-## Results
-
-
-### Participant Characteristics
-
-
-### Main Findings
-
-
-## Discussion
-
-<!-- Interpret your findings -->
-
-### Strengths and Limitations
-
-<!-- Discuss strengths and limitations -->
-
-### Conclusions
-
-<!-- Summarize key findings and implications -->
-
-## References
-
