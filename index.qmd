@@ -4,17 +4,10 @@ author: "Takashi Iida"
 format:
   html: default
   docx: default
+bibliography: references.bib
 ---
 
 ## Abstract
-
-**Background:**
-
-**Methods:**
-
-**Results:**……
-
-**Conclusions:**
 
 ## Introduction
 
@@ -26,29 +19,72 @@ format:
 
 ### Pragraph 1
 
+-   (what is it?)
+
+    -   definitions
+
+        -   Housing is a major pathway through which health disparities emerge and are sustained over time. This review offers a conceptual model for the relationship between housing and health equity, identifying key aspects of housing that relate to health, assessing exposure disparities, and demonstrating the origins of this unequal exposure in structural inequality. [@Swope2019-gm]
+
+        -   Then, we organize the following terms according to three overarching and inter-related concepts often used in housing research and policy to demarcate the key elements of housing: affordability, suitability and security[@Mansour2022-ai]
+
+    -   key mechanisms, theories
+
+        -   domains of cognitive functions
+
+            -   Episodic memory
+
+                -   Most tests measuring verbal episodic memory reported very good predictive accuracy (all above 0.7) and there was little variability related to the test condition (e.g., delayed or immediate, with or without oriented encoding, with or without cues at recall) or the particular material (e.g., words or paragraph)
+
+                -   Both meta-analytic and qualitative examination of AD versus healthy control (HC) studies (*n* = 47) revealed generally high sensitivity and specificity (≥ 80% for AD comparisons) for measures of immediate (sensitivity = 87%, specificity = 88%) and delayed memory (sensitivity = 89%, specificity = 89%), especially those involving word-list recall. Results confirm that memory mea- sures have high diagnostic accuracy for identification of AD, are promising but require further refinement for identification of MCI, and provide support for ongoing investigation of neuro- psychological assessment as a cognitive biomarker of preclini- cal AD. [@Weissberger2017-vb]
+
+            -   Working memory
+
+                -   which part is important for dementia/AD
+                -   AD participants performed significantly worse than the nonimpaired age-matched adults on all three tasks of attentional control, whereas MCI participants performed worse than nonimpaired controls just on the Brown-Peterson procedure when there was a 30-second delayed recall. [@Kirova2015-ix]
+                -   Working memory deficits are a recognized feature of Alzheimer’s disease (AD). They are commonly ascribed to central executive impairment and assumed to relate to frontal lobe dysfunction. [@Stopford2012-bs]
+
 -   (Why does the issue matter?)
 
-    -   the number of people who encounter housing instability effect measure modification
+    -   disease distribution
+
+        -   the number of people who encounter housing instability effect measure modification
+            -   On a single night in January 2024, 771,480 people experienced homelessness in the United States, the largest number since data collection began and an overall increase of 19 percent since 2007. Compared with 2007, 124,222 more people experienced homelessness [@De_Sousa2024-br]
+            -   
+        -   the number of people who develop dementia/ AD
+
+    -   adverse consequences/benefits
+
+        -   mid-file and late life cognitive functions are associated with AD risks. [@Dhana2025-pq]
+
+        -   People with MCI have a ten-fold higher risk of progressing to dementia every year than people of the same age in the general population. Thus, many people with MCI are actually in a prodromal stage of AD. However, not all patients with MCI progress to dementia and it is thus critical for clinicians to identify tools that can accurately separate those who will remain stable from those who will progress to dementia. [@Belleville2017-sr]
+
+    -   policy agenda
 
 ### Pragraph 2
 
 -   (what do we know about the issue?)
 
-    -   existing studies suggest association between housing stress and cognitive functioning such as executive function (EF) skills (Vaid, 2024)
+    -   One study showed that better housing quality is positively associated with higher executive function (EF) skills. [@Vaid2024-my]
+    -   Foreclosure may endanger older adults’ memory. [@Kim2024-se]
+    -   Housing distress was also associated with increased risk of cognitive impairment (RR = 1.20, 95% CI: 1.05, 1.36) [@Wilkinson2026-wu]
+    -   
 
 ### Pragraph 3
 
--   (what do we not know about the issue?) ​​few have investigated detailed cognitive assessments such as immediate and delayed word recall, serial subtraction, and object naming tasks.
+-   (what do we not know about the issue?) ​​
+
+    -   the evidence of the causal effect of housing stress on cognitive decline is still not enough
+    -   few have investigated detailed cognitive assessments such as immediate and delayed word recall, serial subtraction, and object naming tasks.
+        -   which memory domains are damaged more by ongoing housing stress
+        -   can show rate of cognitive function decline over time, rather than one point outcome (cognitive impairment yes or no)
 
 -   (how studying the exposure of interest could shed light on potential interventions that could help reduce the risk of the outcome. )
 
--   These specific cognitive measures are critical as they can be early markers for Alzheimer's disease and dementia (Na Chiangmai et al., 2025).
-
 ### Pragraph 4
 
--   How does this paper address what we do not know?
+-   (How does this paper address what we do not know?)
 
--   This research addresses this gap by examining the longitudinal relationship between housing stress and multiple cognitive domains using HRS data.
+    -   Therecore, this research addresses this gap by examining the average effect of ongoing housing stress on. multiple cognitive domains(Episodic memory and Working memory) among people aged 50 and older in the United States
 
 <!-- -->
 
@@ -61,3 +97,5 @@ format:
 
 ## 
 :::
+
+## Method
