@@ -1,0 +1,86 @@
+---
+title: "Ongoing Housing Stress and Cognitive Functions"
+subtitle: "EP808 E2 seminar presentation"
+author: "Takashi Iida, MD, MPH(c)"
+date: "2026/02/12"
+format:
+  revealjs: 
+    theme: night
+    slide-level: 2
+    width: 1920       
+    height: 1080      
+    margin: 0.1      
+    font-size: 28px 
+    reference-location: document
+    css: styles.css
+bibliography: references.bib
+link-citations: false
+suppress-bibliography: true
+---
+
+## Background
+### <span style="color:#FFD54A; font-size:1.25em; font-weight:700;">Ongoing Housing Stress</span>
+
+-   Housing is a major pathway through which health disparities emerge and are sustained over time [@Swope2019-gm]
+
+-   771,480 people experienced homelessness in the U.S. [@De_Sousa2024-br]
+
+<br>
+
+### Cognitive Domains of Interest
+
+:::  columns
+::: {.column width="50%"}
+<span style="color:#FFD54A; font-size:1.25em; font-weight:700;">Episodic Memory</span>
+
+-   Verbal episodic memory shows high predictive accuracy (\>0.7)
+-   High sensitivity and specificity (≥80%) for AD identification [@Weissberger2017-vb]
+:::
+
+::: {.column width="50%"}
+<span style="color:#FFD54A; font-size:1.25em; font-weight:700;">Working Memory</span>
+
+-   Working memory deficits are a recognized feature of AD
+-   Related to frontal lobe dysfunction [@Stopford2012-bs]
+:::
+::: 
+
+
+
+## Why Does This Issue Matter?
+
+### Housing Instability Implications
+
+-   Foreclosure may endanger older adults' memory [@Kim2024-se]
+
+-   Housing distress associated with increased risk of cognitive impairment (RR = 1.20) [@Wilkinson2026-wu]
+
+<br>
+
+### Cognitive Function Implications
+-   Mid-life and late-life cognitive functions are associated with AD risks [@Dhana2025-pq]
+
+-   MCI patients have 10-fold higher risk of progressing to dementia [@Belleville2017-sr]
+
+<br>
+
+::: {.callout-warning .big-callout }
+### What Don't We Know?
+
+-   Causal effect of housing stress on cognitive decline is not well established
+
+-   Few studies have investigated detailed cognitive assessments:
+:::
+
+
+## Research Question
+
+<br>
+
+This research question is examining: 
+
+<br>
+
+<span style="color:#FFD54A; font-size:1.25em; font-weight:700;">The average causal effect of ongoing housing stress on multiple cognitive domains(**Episodic Memory** and **Working Memory**) among adults aged 50 and older in the United States</span>
+
+

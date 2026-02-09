@@ -1,0 +1,23 @@
+/* スライド全体の基本行間 */
+.reveal section {
+  line-height: 1.25;   /* 1.2〜1.35くらいで調整 */
+}
+
+/* 箇条書きの行間 + 項目間の余白 */
+.reveal ul,
+.reveal ol {
+  line-height: 1.25;
+  margin-top: 0.3em;
+}
+
+.reveal li {
+  margin-bottom: 0.35em;  /* 0.2〜0.5emで調整 */
+}
+
+/* 見出しの下に余白をつける（詰まりやすい所） */
+.reveal h2 { margin-bottom: 0.4em; }
+.reveal h3 { margin-bottom: 0.35em; }
+.reveal h4 { margin-bottom: 0.3em; }
+
+/* 段落の余白 */
+.reveal p { margin: 0.4em 0; }
