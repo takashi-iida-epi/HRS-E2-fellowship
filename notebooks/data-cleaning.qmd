@@ -1,0 +1,308 @@
+---
+title: "Analysis"
+author: "Takashi Iida"
+date: today
+format: html
+html-table-processing: none
+---
+## Overview
+
+This document creates tables and figures for the manuscript.
+
+## Setup
+
+```{r}
+#| label: setup
+#| message: false
+
+
+library(tidyverse)
+library(haven)
+```
+
+## Load clean data  
+
+```{r}
+# data import
+# install.packages("haven")
+
+
+getwd()
+
+base_directory <- "/Users/iidatakashi/Documents/Git/HRS-E2-fellowship/data"
+
+setwd(base_directory)
+
+dat <- read_sas("randhrs1992_2022v1.sas7bdat")
+
+```
+
+## Overall data exploration
+
+```{r}
+#| label: overall-exploration
+#| echo: true
+#| message: false
+
+
+head(dat)
+dim(dat)  # n. of observation and n. of variables
+names(dat) # names of variables
+```
+
+## Variables names
+Variable structure
+- [Person/Unit][Wave][Topic...]
+    - 1st character: who the variable refers to
+        - R = respondent (reference person)
+        - S = spouse/partner
+        - H = household
+    - 2nd character: wave identifier
+        - 1,2,3,... = specific wave
+        - sometimes A = “all waves” / not wave-specific (varies by item)
+
+person id: HHIDPN (HHIDPN: HHold ID + Person Number /Num)
+
+
+```{r}
+
+
+dat %>% group_by("HHIDPN") |> select(contains("HOUSEPRB")) 
+nrow(dat %>% group_by("HHIDPN"))
+nrow
+
+
+
+```
+
+
+
+## Exposure exploration
+
+- Exposure is Ongoing housing problems. 
+- Identifier is HOUSEPRB in the colmun names. 
+
+```{r}
+#| label: exposure-exploration
+#| echo: false
+
+# numbers of waves containing HOUSEPRB
+dim(dat %>% select(contains("HOUSEPRB"))) #  16
+
+# waves: S&R 8,10,11,12,13,14,15,16
+names(dat %>% select(contains("HOUSEPRB"))) 
+```
+
+
+```{r}
+
+view(dat |> filter(dat$HHIDPN == 10001010) |> select(contains("HOUSEPRB")))
+
+table(dat$R16LBHOUSEPRB, useNA = "ifany") 
+table(dat$S16LBHOUSEPRB, useNA = "ifany")# one example among several 
+
+## Ongoing housing preoblems: Categorical variables
+table(dat$R12LBHOUSEPRB, useNA = "ifany") 
+table(dat$S12LBHOUSEPRB, useNA = "ifany")# one example among several waves
+prop.table(table(dat$R12LBHOUSEPRB))
+
+# check cols for Ongoing housing preoblems
+dat %>% select(contains("HOUSEPRB"))
+dim(dat %>% select(contains("HOUSEPRB")))
+names(dat %>% select(contains("HOUSEPRB")))
+
+# Number of completed interviews per wave
+colSums(!is.na(dat %>% select(contains("HOUSEPRB"))))
+
+# Total number of completed interviews (all waves combined)
+sum(dat %>% select(contains("HOUSEPRB")), na.rm = TRUE)
+
+# integrate into vector
+all_house_values <- unlist(dat %>% select(contains("HOUSEPRB")))
+
+# distribution
+table(all_house_values, useNA = "ifany")
+
+# proportion
+prop.table(table(all_house_values))
+```
+
+
+## Outcome-exploration
+
+Ongoing Housing Problem
+1. No did not happen 
+2. Yes but not upsetting 
+3. Yes somewhat upsetting 
+4. Yes very upsetting
+
+```{r}
+#| label: outcome-exploration
+#| echo: false
+
+# numbers of waves containing DLRC
+dim(dat %>% select(contains("DLRC"))) #  16
+
+# waves: S&R 1-15
+names(dat %>% select(contains("DLRC"))) 
+```
+
+
+```{r}
+
+view(dat |> filter(dat$HHIDPN == 10001010) |> select(contains("DLRC")))
+
+dat_ex_R <- dat |> 
+    select("HHIDPN", "R8LBHOUSEPRB", "R8DLRC", "R10DLRC", "R11DLRC", 
+    "R12DLRC", "R13DLRC") 
+head(dat_ex)
+dim(dat_ex)
+
+dat_ex |> 
+    group_by(R8LBHOUSEPRB) |> 
+    summarise(
+        mean_delayed_recall = mean(R8DLRC, na.rm = TRUE),
+    n = n()
+    )
+
+dat_ex |> 
+    group_by(S8LBHOUSEPRB) |> 
+    summarise(
+        mean_delayed_recall = mean(S8DLRC, na.rm = TRUE),
+        n = n()
+    )
+
+    dat_ex |> 
+    group_by(S15LBHOUSEPRB) |> 
+    summarise(
+        mean_delayed_recall = mean(S15DLRCP, na.rm = TRUE),
+        n = n()
+    )
+
+dat_ex_R <- dat_ex_R |> 
+    drop_na("HHIDPN", "R8LBHOUSEPRB", "R8DLRC", "R10DLRC", "R11DLRC", 
+    "R12DLRC", "R13DLRC")
+dim(dat_ex_R)
+dat_ex_R |> 
+    group_by(R8LBHOUSEPRB) |> 
+    summarise(
+        mean_dlrc_w8 = mean(R8DLRC, na.rm = TRUE),
+        mean_dlrc_w10 = mean(R10DLRC, na.rm = TRUE),
+
+        mean_dlrc_w11 = mean(R11DLRC, na.rm = TRUE),
+        mean_dlrc_w12 = mean(R12DLRC, na.rm = TRUE),
+        mean_dlrc_w13 = mean(R13DLRC, na.rm = TRUE),
+        n = n()
+    )
+dim(dat_ex_R)
+
+library(ggplot2)
+library(tidyr)
+
+# データを作成して、long形式に変換
+plot_data <- dat_ex_R |> 
+    group_by(R8LBHOUSEPRB) |> 
+    summarise(
+        mean_dlrc_w8 = mean(R8DLRC, na.rm = TRUE),
+        mean_dlrc_w10 = mean(R10DLRC, na.rm = TRUE),
+        mean_dlrc_w11 = mean(R11DLRC, na.rm = TRUE),
+        mean_dlrc_w12 = mean(R12DLRC, na.rm = TRUE),
+        mean_dlrc_w13 = mean(R13DLRC, na.rm = TRUE),
+        n = n()
+    ) |>
+    pivot_longer(
+        cols = starts_with("mean_dlrc"),
+        names_to = "wave",
+        values_to = "mean_dlrc"
+    ) |>
+    mutate(
+        wave_num = case_when(
+            wave == "mean_dlrc_w8" ~ 8,
+            wave == "mean_dlrc_w10" ~ 10,
+            wave == "mean_dlrc_w11" ~ 11,
+            wave == "mean_dlrc_w12" ~ 12,
+            wave == "mean_dlrc_w13" ~ 13
+        ),
+        R8LBHOUSEPRB = factor(R8LBHOUSEPRB)
+    )
+
+# 折れ線グラフ作成
+ggplot(plot_data, aes(x = wave_num, y = mean_dlrc, 
+                       color = R8LBHOUSEPRB, 
+                       group = R8LBHOUSEPRB)) +
+    geom_line(linewidth = 1) +
+    geom_point(size = 3) +
+    labs(
+        title = "Mean DLRC Score by Housing Problem Status",
+        x = "Wave",
+        y = "Mean DLRC Score",
+        color = "Housing Problem"
+    ) +
+    scale_x_continuous(breaks = c(8, 10, 11, 12, 13)) +
+    theme_minimal()
+```
+
+```{r}
+dat_ex_R_ser7 <- dat |>
+    select(HHIDPN, R8LBHOUSEPRB, R8SER7, R10SER7, R11SER7,
+    R12SER7, R13SER7) |>
+    drop_na()
+
+table(dat_ex_R_ser7$R8LBHOUSEPRB, dat_ex_R_ser7$R8SER7)
+
+
+dim(dat_ex_R_ser7)
+dat_ex_R_ser7 |>
+    group_by(R8LBHOUSEPRB) |>
+    summarise(
+        mean_ser7_w8 = mean(R8SER7, na.rm = TRUE),
+        mean_ser7_w10 = mean(R10SER7, na.rm = TRUE),
+        mean_ser7_w11 = mean(R11SER7, na.rm = TRUE),
+        mean_ser7_w12 = mean(R12SER7, na.rm = TRUE),
+        mean_ser7_w13 = mean(R13SER7, na.rm = TRUE),
+        n = n()
+    )
+
+# データを作成して、long形式に変換
+plot_data_ser7 <- dat_ex_R_ser7 |>
+    group_by(R8LBHOUSEPRB) |>
+    summarise(
+        mean_ser7_w8 = mean(R8SER7, na.rm = TRUE),
+        mean_ser7_w10 = mean(R10SER7, na.rm = TRUE),
+        mean_ser7_w11 = mean(R11SER7, na.rm = TRUE),
+        mean_ser7_w12 = mean(R12SER7, na.rm = TRUE),
+        mean_ser7_w13 = mean(R13SER7, na.rm = TRUE),
+        n = n()
+    ) |>
+    pivot_longer(
+        cols = starts_with("mean_ser7"),
+        names_to = "wave",
+        values_to = "mean_ser7"
+    ) |>
+    mutate(
+        wave_num = case_when(
+            wave == "mean_ser7_w8" ~ 8,
+            wave == "mean_ser7_w10" ~ 10,
+            wave == "mean_ser7_w11" ~ 11,
+            wave == "mean_ser7_w12" ~ 12,
+            wave == "mean_ser7_w13" ~ 13
+        ),
+        R8LBHOUSEPRB = factor(R8LBHOUSEPRB)
+    )
+
+# 折れ線グラフ作成
+ggplot(plot_data_ser7, aes(x = wave_num, y = mean_ser7,
+                       color = R8LBHOUSEPRB,
+                       group = R8LBHOUSEPRB)) +
+    geom_line(linewidth = 1) +
+    geom_point(size = 3) +
+    labs(
+        title = "Mean SER7 Score by Housing Problem Status",
+        x = "Wave",
+        y = "Mean SER7 Score",
+        color = "Housing Problem"
+    ) +
+    scale_x_continuous(breaks = c(8, 10, 11, 12, 13)) +
+    theme_minimal()
+```
+

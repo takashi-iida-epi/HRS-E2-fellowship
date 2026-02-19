@@ -30,6 +30,11 @@ ncol(data) #variables
 names(data) # names of variables
 
 
+## ====================
+# check variable names
+# ====================
+
+head(data$HHIDPN)
 
 # ====================
 # Examine Sample Size: (wide format)

@@ -84,7 +84,9 @@ bibliography: references.bib
 
 -   (How does this paper address what we do not know?)
 
-    -   Therecore, this research addresses this gap by examining the average effect of ongoing housing stress on. multiple cognitive domains(Episodic memory and Working memory) among people aged 50 and older in the United States
+    -   Therecore, this research addresses this gap by examining the average effect of ongoing housing stress on multiple cognitive domains(Episodic memory and Working memory) among people aged 50 and older in the United States
+
+    - 
 
 <!-- -->
 
@@ -99,3 +101,12 @@ bibliography: references.bib
 :::
 
 ## Method
+
+
+
+
+## to do
+- make manuscript.qmd, and start writing Introduction
+    - check which is valuatbe focusing on 2 domains or cheking results for all of domains in continous level
+        - search for evidence focusing on specific types of domains
+- check data structure, variable name so that I can do quick analysis
