@@ -7,8 +7,6 @@ format:
 bibliography: references.bib
 ---
 
-## Abstract
-
 ## Introduction
 
 ### hypothesis
@@ -43,13 +41,28 @@ bibliography: references.bib
                 -   AD participants performed significantly worse than the nonimpaired age-matched adults on all three tasks of attentional control, whereas MCI participants performed worse than nonimpaired controls just on the Brown-Peterson procedure when there was a 30-second delayed recall. [@Kirova2015-ix]
                 -   Working memory deficits are a recognized feature of Alzheimer’s disease (AD). They are commonly ascribed to central executive impairment and assumed to relate to frontal lobe dysfunction. [@Stopford2012-bs]
 
+    -   Effect measure modification
+
+        -   In addition, some papers mentioned that women tent do have higher memory, but have faster cognitive decline than men.
+
+            -   Women tend to score higher on immediate and delayed word recall among older age. [@Golchert2019-un]
+
+            -   Women had significantly higher baseline performance than men in global cognition, executive function, and memory. Compared with men, women had significantly faster declines in global cognition and executive function. However, men and women had similar declines in memory. [@Levine2021-pj]
+
+        -   Housing stress may affect cognitive function.
+
+        -   Also, recently occurring stressful life events reported was associated with greater memory decline later life in women but not in men. [@Munro2019-dx]
+
+        -   So, there is a possiblity that women are more vulnerable to housing stress.
+
+        -   so, we will examine the effect measure modification by sex
+
 -   (Why does the issue matter?)
 
     -   disease distribution
 
         -   the number of people who encounter housing instability effect measure modification
             -   On a single night in January 2024, 771,480 people experienced homelessness in the United States, the largest number since data collection began and an overall increase of 19 percent since 2007. Compared with 2007, 124,222 more people experienced homelessness [@De_Sousa2024-br]
-            -   
         -   the number of people who develop dementia/ AD
 
     -   adverse consequences/benefits
@@ -86,11 +99,10 @@ bibliography: references.bib
 
     -   Therecore, this research addresses this gap by examining the average effect of ongoing housing stress on multiple cognitive domains(Episodic memory and Working memory) among people aged 50 and older in the United States
 
-    - 
-
-<!-- -->
-
 -   (what is your research question)
+
+    -   My research question is examining the average causal effect of ongoing housing stress on multiple cognitive domains(**Episodic Memory** and **Working Memory**) among adults aged 50 and older in the United States.
+    -   
 
 ::: {.callout-note collapse="true"}
 ## I need to check citation papers
@@ -102,11 +114,232 @@ bibliography: references.bib
 
 ## Method
 
+-   **Data**
+    -   **Data Collection:** Describe the study design and setting (the "who," such as location, sociodemographics, timing, and follow-up period).
 
+        -   The Health and Retirement Study (HRS), a nationally representative cohort of U.S. adults aged 50 and older.
 
+        -   From the original HRS cohort including all waves, it has 45,234 participants.
+
+        -   Wave 8 included
+
+        -   Wave 9 (2008) was excluded from the analysis because housing stress data were not collected in that wave.
+
+    -   **Sampling & Method:** Describe how the data was collected (the "how," such as questionnaires, interviews, or electronic health records).
+
+    -   **Analytic Sample Selection:** Detail the inclusion and exclusion criteria based on the research question, study design, non-response, loss to follow-up, and missing data.
+
+        -   inclusion criteria
+
+            -   people with data of exposure and outcome at wave 8
+                -   we restricted only respondents and did not use spouse data, because housing environment can be shared in the same environment, which may cause same housing stress. Thus, if spouse or partner of the respondent are analyzed in the same way, the data may be correlated between respondent and spouse.
+
+        -   baseline
+
+            -   wave 8 (2006)
+
+        -   follow-up
+
+            -   from wave 8 to wave 13 (2006-2016): 10 years
+
+        -   Exclusion criteria
+
+            -   Respondents who reported a doctor-diagnosed memory-related disease at baseline (Wave 8) were excluded from the analysis.
+                -   RwMEMRY indicates the raw response to the question regarding whether or not a doctor has told the Respondent they had a memory-related disease. RwMEMRYE is an indicator variable denoting whether or not the Respondent reports a doctor has ever told them that they had this condition in this or any previous wave
+            -   Respondents who did not have Housing stress data at baseline were excluded
+            -   Respondents without Immediate Word Recall, Delayed Word Recall, and Serial 7’s were excluded
+
+        -   **Flow Chart:** Provide a shell flow chart illustrating how the final analytic sample was derived.
+-   **Measurement**
+    -   For the **Exposure**, **Outcome**, and **Covariates** (including confounders and effect measure modifiers), you must outline:
+
+    -   *What was measured and how?* Include details like timing, whether it was self-reported or objective, phrasing of questions, options (e.g., Yes/No, Likert scale), and units.
+
+    -   *How was it handled?* Explain if variables were combined into a scale/index, or if continuous variables were categorized, dichotomized, or collapsed.
+
+    -   *Why?* Justify your modifications and cut-offs based on clinical/theoretical meaning, past research, or data distribution.
+
+    -   exposure : ongoing housing stress
+
+        -   Ongoing housing stress
+            -   question and answer
+                -   This item was one of the items of ongoing chronic stressors, which wereused to assess a Respondent’s exposure and perception of common chronic stressors.
+
+                -   Responses indicate if a problem has lasted at least twelve months and how upsetting each problem has been using one of four categories, "1=No, didn’t happen," "2=Yes, but not upsetting," "3=Yes, somewhat upsetting," or "4=Yes, very upsetting." Items are scored 1-4 by HRS.
+
+                -   <div>
+
+                    1.  No did not happen
+                    2.  Yes but not upsetting
+                    3.  Yes somewhat upsetting
+                    4.  Yes very upsetting
+
+                    </div>
+            -   *Measurement*
+                -   This answer was self report.
+                -   The Ongoing Chronic Stressor Scale and its input questions are provided starting in Wave 8 (2006). So the baseline wave was set at wave 8.
+                -   In Wave 9 (2008) HRS did not ask Leave-Behind Respondents the input questions for the scale, so they are not provided for this wave.
+                -   This item was handled in a single item as an exposure. This way of handling is supported by HRS user guide of Psychosocial and Lifestyle Questionnaire 2006 - 2022[@Smith2023-xv]
+
+    -   outcome : cognitive function
+
+        -   Episodic memory
+            -   Immediate Word Recall + Delayed Word Recall
+                -   total_recall = immediate + delayed
+                -   z_total_recall = (total_recall − mean(total_recall))/SD(total_recall)
+                -   Immediate Word Recall
+                    -   measurement
+                        -   The cognition variables are taken directly from the HRS imputations of cognitive functioning.
+                        -   For Waves 14 forward, some cognition measures collected via Web interviews differed in their implementation, measurement, or collection method. Due to these differences, these cognition variables are separated into two measures: one ending in \[P\] for Face-to-Face/Telephone interviews and one ending in \[W\] for Web interviews. For some variables, only the \[P\] for Face-to-Face/Telephone interviews measure is provided.
+                        -   The interviewer read a list of 10 nouns (e.g., lake, car, army, etc.) to the respondent, and asked the respondent to recall as many words as possible from the list in any order. The interviewer read one of four possible lists of 10 nouns to the respondent. The lists did not overlap in word content. In addition, the initial list was randomly assigned to the respondent, although the assignment was made longitudinally such that each respondent was assigned a different set of words in each of four successive waves of data collection. The assignment was also made so that two respondents in the same household (i.e., spouses or partners of one another) were not assigned the same set of words in the same or adjacent waves. [@McCammon2023-oa]
+                    -   scoring
+                        -   Count of number of words that were recalled correctly.
+                        -   Count ranges from 0-10 for all waves from 8 to 13.
+                -   Delayed word recall
+                    -   Measurement
+                        -   After approximately 5 minutes of asking other survey questions (e.g., depression, and cognition items including backwards count, and serial 7’s) the respondent was asked to recall the nouns previously presented as part of the immediate recall task. [@McCammon2023-oa]
+                        -   The questions asked between administration of the immediate word recall and delayed word recall tasks varied to some degree across survey waves.
+                    -   scoring
+                        -   Count of number of words that were recalled correctly.
+                        -   Count ranges from 0-10 for all waves from 8 to 13.
+        -   Working memory
+            -   Serial 7’s
+                -   The interviewer asked the respondent to subtract 7 from 100, and continue subtracting 7 from each subsequent number for a total of five trials. It was up to the respondent to remember the value from the prior subtraction, such that the interviewer did not repeat the difference said by the respondent after each trial. [@McCammon2023-oa]
+            -   Scoring
+                -   Scoring is a count of the number of correct subtractions among the five trials (0-5). Each subtraction was scored independently.
+                -   For example, if a respondent made a mistake on the first subtraction (e.g., reported 92 instead of 93) but gave correct answers for each subsequent subtraction (using 92 as a starting point and answering 85 for the second subtraction), he/she would receive a score of 4.
+        -   Imputation
+            -   Before multiple imputation, HRS data offered imputed cognition data.
+            -   Values were imputed to replace missing values, refusals (RF), and any not applicable (NA) response using a multivariate, regression-based procedure using Imputation and Variance Estimation (IVEware) software.
+            -   A combination of relevant demographic, health, and economic variables, as well as prior and current wave cognitive variables to perform the imputations.
+            -   Don’t Know (DK) responses were coded as incorrect and were not imputed.
+            -   We used imputed cognition data as is, then NA cognition data were imputed by multiple imputation.
+
+    -   confounders
+
+        -   demographics
+            -   age
+                -   Age at the beginning of the interview in years was used.
+                    -   Age at the beginning of the interview (RwAGEM_B) is calculated from the Respondent birth date and beginning interview date (RwIWBEG), in months and years. Age in years (RwAGEY_B) is the integer portion of the number of months old divided by 12.
+            -   sex
+            -   race and ethnicity are combined into Non-Hispanic White, non-Hispanic Black, Hispanic, Non-Hispanic Other
+        -   SDOH
+            -   education
+                -   categolized into
+                    -   Lt High-school, GED, High-school graduate, some college, college and above
+            -   income
+                -   total household income are used
+                -   Income measures are reported in nominal dollars.
+                -   Household income was used as reported in the RAND HRS data, where missing values were imputed by RAND using unfolding brackets methodology. \[RAND HRS documentation (v1)\]
+        -   health behavior
+            -   smoking
+        -   health problems
+            -   Comorbidity index (range 0-8)
+                -   high BP
+
+                    -   high blood pressure or hypertension
+
+                -   diabetes
+
+                    -   diabetes or high blood sugar
+
+                -   cancer
+
+                    -   cancer or a malignant tumor of any kind except skin cancer
+
+                -   lung disease
+
+                    -   chronic lung disease except asthma such as chronic bronchitis or emphysema
+
+                -   heart problem
+
+                    -   heart attack, coronary heart disease, angina, congestive heart failure, or other heart problems
+
+                -   stroke
+
+                    -   stroke or transient ischemic attack
+
+                -   psychiatric problem
+
+                    -   emotional, nervous, or psychiatric problems
+
+                -   arthritis
+
+                    -   arthritis or rheumatis
+
+                -   Each of these variables is set to "1" if the Respondent ever answered "yes" to the pertinent question in the current or any prior wave and is otherwise set to "0."
+
+                -   The Comorbidity index is counted as a sum of "yes" in each disease.
+
+                -   The multimorbidity burden (range, 0-8) was calculated as the total number of self-reported chronic health conditions, including hypertension, diabetes, cancer, lung diseases, heart diseases, stroke, psychological problems, and arthritis. [@Pan2023-cy]
+        -   confounders at baseline (wave 8; 2006) are used
+            -   each wave has conducted every 2 years, so using pre-baseline confounders as covariates are too old (baseline confounders could be changed compared with pre-baseline confounders)
+
+        <!-- -->
+
+        -   each wave has conducted every 2 years, so using pre-baseline confounders as covariates are too old (baseline confounders could be changed compared with pre-baseline confounders)
+        -   Effect major modifier
+            -   sex
+
+    -   **Statistical Analysis**
+
+        -   **Descriptive Analysis:** Plan for Table 1 (sample characteristics).
+
+            -   table 1 variables
+
+                -   age, sex, race, education, income, other chronic stress, health problems
+
+                -   by ongoing housing stress(1,2,3,4)
+
+                -   add Total word recall, Serial 7’s?
+
+            -   **Main Analysis:** Describe the models used to answer the research question (e.g., linear regression for mean outcome difference, logistic regression for odds ratio). Include how you will assess overall associations and any effect measure modifications (subgroups or interaction terms).
+
+            <!-- -->
+
+            -   Fixed Effects Model
+
+                -   age, income, other chronic stress were adjusted in the model
+
+                -   Sex, Education were not included in adjusted model because of the feature of the model
+
+            -   Sub-group analysis
+
+                -   by sex
+
+                -   create different models between male vs female
+
+        -   **Sensitivity/Supplementary Analysis:** Detail methods to assess the plausibility of your assumptions or re-analyze using different assumptions (e.g., changing the analytic sample, functional form, or exposure specifications).
+
+            -   Sensitivity analysis
+
+                -   Comorbidity index + or -
+
+                    -   high BP
+
+                    -   diabetes
+
+                    -   cancer
+
+                    -   lung disease
+
+                    -   heart problem
+
+                    -   stroke
+
+                    -   psychiatic problem
+
+                    -   arthritis
+
+                    -   The multimorbidity burden (range, 0-8) was calculated as the total number of self-reported chronic health conditions, including hypertension, diabetes, cancer, lung diseases, heart diseases, stroke, psychological problems, and arthritis. [@Pan2023-cy]
+
+        -   **Missing Data/Software:** Mention how missing data is addressed and note the statistical software utilized.
+
+            -   multiple imputation for exp and outcome
 
 ## to do
-- make manuscript.qmd, and start writing Introduction
-    - check which is valuatbe focusing on 2 domains or cheking results for all of domains in continous level
-        - search for evidence focusing on specific types of domains
-- check data structure, variable name so that I can do quick analysis
+
+-   make manuscript.qmd, and start writing Introduction
+    -   check which is valuatbe focusing on 2 domains or cheking results for all of domains in continous level
+        -   search for evidence focusing on specific types of domains
+-   check data structure, variable name so that I can do quick analysis

@@ -20,7 +20,10 @@ library(tidyverse)
 library(haven)
 ```
 
-## Load clean data  
+## Load clean data 
+
+- raw data: dat
+- analysis data: dat_an
 
 ```{r}
 # data import
@@ -71,8 +74,6 @@ dat %>% group_by("HHIDPN") |> select(contains("HOUSEPRB"))
 nrow(dat %>% group_by("HHIDPN"))
 nrow
 
-
-
 ```
 
 
@@ -81,6 +82,7 @@ nrow
 
 - Exposure is Ongoing housing problems. 
 - Identifier is HOUSEPRB in the colmun names. 
+- Includde waves from 8 to 13 (10 years)
 
 ```{r}
 #| label: exposure-exploration
@@ -91,9 +93,16 @@ dim(dat %>% select(contains("HOUSEPRB"))) #  16
 
 # waves: S&R 8,10,11,12,13,14,15,16
 names(dat %>% select(contains("HOUSEPRB"))) 
+
+# select person_id,  House problem from w8 to w13
+# make lists 
+list_id_husplb <- c("HHIDPN", "R8LBHOUSEPRB", "R10LBHOUSEPRB","R11LBHOUSEPRB", "R12LBHOUSEPRB", "R13LBHOUSEPRB", "R14LBHOUSEPRB" )
+names(dat |> select(list_id_husplb, list_IMRC))
+
 ```
 
 
+# delete later
 ```{r}
 
 view(dat |> filter(dat$HHIDPN == 10001010) |> select(contains("HOUSEPRB")))
@@ -130,24 +139,374 @@ prop.table(table(all_house_values))
 
 ## Outcome-exploration
 
-Ongoing Housing Problem
-1. No did not happen 
-2. Yes but not upsetting 
-3. Yes somewhat upsetting 
-4. Yes very upsetting
+- Immediate Word Recall: IMRC
+    - memo: RwFIMRC, RwFIMRCP, and RwFIMRCW indicate whether the value was imputed (=1) or not (=0). -> we will not use
+- Delayed Word Recall
+    - memo: RwFDLRC, RwFDLRCP, and RwFDLRCW indicate whether the value was imputed (=1) or not (=0). 
+- Serial 7’s
+- Wave 9 (2008) was excluded from the analysis as housing stress data were not collected in that wave
 
 ```{r}
 #| label: outcome-exploration
 #| echo: false
 
-# numbers of waves containing DLRC
-dim(dat %>% select(contains("DLRC"))) #  16
+# Immediate word recall
+names(dat |> select(contains("IMRC")))
+list_IMRC <- c("R8IMRC","R10IMRC","R11IMRC", "R12IMRC", "R13IMRC")
 
-# waves: S&R 1-15
-names(dat %>% select(contains("DLRC"))) 
+# Delayed word recall
+names(dat |> select(contains("DLRC")))
+list_DLRC <- c("R8DLRC","R10DLRC","R11DLRC", "R12DLRC", "R13DLRC")
+
+# Series 7s
+names(dat |> select(contains("SER7")))
+list_SER7 <- c("R8SER7","R10SER7","R11SER7", "R12SER7", "R13SER7")
 ```
 
 
+## Confounding exploration
+variables to exlude 
+- memory-related disease
+    - whether or not the Respondent reports a doctor has ever told
+them that they had this condition in this or any previous wave
+    - 0: No
+    - 1: Yes
+- memo
+    - dementia, alzheimer disease were measured from wave 10
+
+
+variabels in table 1
+- age
+    - age at the begging of the interview in years
+- sex
+    - 1: Male
+    - 2: Female
+- Race
+    - 1.White/Caucasian 
+    - 2.Black/African American 
+    - 3.Other
+- Ethnicity
+    - 0.Not Hispanic
+    - 1.Hispanic
+- education
+    - 1. Lt High-school
+    - 2. GED, 
+    - 3. High-school graduate
+    - 4. some college
+    - 5. college and above
+- income
+    - total household income
+- smoking
+    - current smoking status
+    - 0: No
+    - 1: Yes
+- Doctor diagnosied health problems: ever have condition
+    - high BP
+    - diabetes
+    - cancer
+    - lung disease
+    - heart problem
+    - stroke
+    - psychiatic problem
+    - arthritis
+    - answer
+        - 0: No
+        - 1: Yes
+    - memo
+        - sleep disorder is measured from w13, so not included
+
+Sex, Education were not included in adjusted model because of the feature of the model
+
+```{r}
+# exclusion variabels
+
+## dementia ever
+names(dat |> select(contains("MEMRYE")))
+list_exclude <- c("R8MEMRYE")
+
+dat |> select(list_exclude) |> filter(R8MEMRYE==1) |> nrow()
+
+
+# variabels in table 1
+
+## age at the begging of the interview in years
+names(dat |> select(contains("AGEY"))) # R8AGEY_B
+
+## Gender of respondents
+## 1: Male
+## 2: Female
+names(dat |> select(contains("RAGENDER"))) # RAGENDER
+
+## Race
+## 1.White/Caucasian 
+## 2.Black/African American 
+## 3.Other
+names(dat |> select(contains("RARACEM"))) # RARACEM
+
+
+## Ethnicity
+## 0.Not Hispanic
+## 1.Hispanic
+names(dat |> select(contains("RAHISPAN"))) # RAHISPAN
+
+## Education
+## 1. Lt High-school
+## 2. GED, 
+## 3. High-school graduate
+## 4. some college
+## 5. college and above
+names(dat |> select(contains("RAEDUC"))) # RAEDUC
+
+
+## Income:
+## total household income
+## cont : nominal dollars
+## from w8 to w13
+# "H8ITOT"  "H9ITOT"  "H10ITOT" "H11ITOT"
+# "H12ITOT" "H13ITOT"
+names(dat |> select(contains("ITOT"))) 
+
+## Smoking
+## 0: No
+## 1: Yes
+names(dat |> select(contains("SMOKEN"))) 
+
+list_confound <- c(
+    "R8AGEY_B", "R10AGEY_B",   # age
+    "R11AGEY_B", "R12AGEY_B", "R13AGEY_B",
+    "RAGENDER", # gender
+    "RARACEM",  # race
+    "RAHISPAN", # ethnicity
+    "RAEDUC", # education
+    "H8ITOT",  "H10ITOT", # income
+    "H11ITOT","H12ITOT", "H13ITOT",
+    "R8SMOKEN", "R10SMOKEN", "R11SMOKEN", # smoking
+    "R12SMOKEN", "R13SMOKEN"
+    )
+
+
+## Doctor diagnosied health problems
+### High BP
+names(dat |> select(contains("HIBP"))) 
+list_BP_1 <- c("R8HIBPE", "R10HIBPE","R11HIBPE", "R12HIBPE","R13HIBPE")
+
+### Diabetes
+names(dat |> select(contains("DIABE"))) 
+list_db_2 <- c("R8DIABE", "R10DIABE", "R11DIABE", "R12DIABE", "R13DIABE")
+
+### Cancer
+names(dat |> select(contains("CANCRE"))) 
+list_cancr_3 <- c("R8CANCRE", "R10CANCRE", "R11CANCRE", "R12CANCRE", "R13CANCRE")
+
+### Cancer
+names(dat |> select(contains("LUNGE"))) 
+list_lung_4 <- c("R8LUNGE", "R10LUNGE", "R11LUNGE", "R12LUNGE","R13LUNGE")
+
+### Heart problem
+names(dat |> select(contains("HEARTE")))       
+list_heart_5 <- c("R8HEARTE", "R10HEARTE",     
+  "R11HEARTE", "R12HEARTE", "R13HEARTE")         
+                                                 
+### Stroke                                         
+names(dat |> select(contains("STROKE")))
+list_stroke_6 <- c("R8STROKE", "R10STROKE",
+  "R11STROKE", "R12STROKE", "R13STROKE")
+
+### Psychiatric Problems
+names(dat |> select(contains("PSYCHE")))
+list_psych_7 <- c("R8PSYCHE", "R10PSYCHE",
+  "R11PSYCHE", "R12PSYCHE", "R13PSYCHE")
+
+### Arthritis
+names(dat |> select(contains("ARTHRE")))
+list_arthr_8 <- c("R8ARTHRE", "R10ARTHRE",
+  "R11ARTHRE", "R12ARTHRE", "R13ARTHRE")
+
+
+## list Comorbidity index
+ list_Comorbidity_index <- c(list_BP_1,         
+  list_db_2, list_cancr_3, list_lung_4,          
+  list_heart_5, list_stroke_6, list_psych_7,     
+  list_arthr_8)                                  
+                   
+
+# try
+#dat |> select(contains("H8ITOT")) |> head()
+#dat |> select(contains("RAEDUC")) |> unique()
+#dat |> select(list_Comorbidity_index) 
+
+```
+
+
+
+## data merge
+
+```{r}
+dat_an <- dat |> 
+    select(list_id_husplb, list_IMRC, list_DLRC, list_SER7, list_confound, list_Comorbidity_index, list_exclude)
+head(dat_an)
+names(dat_an)
+dim(dat_an)
+```
+
+
+## Make conbined variables
+
+Outcome
+- Z scored total recall
+    - total recall = immediate word recall + delayed word recall(range from 0-20)
+    - z scored total recall
+    - mean and sd are used in the wave
+- Z scored Series 7s
+    - mean and sd are used in the wave
+
+Confounders
+- race and ethnicity 
+    - Non-Hispanic White
+    - Non-Hispanic Black
+    - Hispanic
+    - Non-Hispanic Other
+- Comorbidity index
+    - range from 0-8
+    - total counts of Yes(1) among Doctor diagnosied health problems
+
+```{r}
+
+# Total recall, Z-scored total recall, Z-scored Series 7s
+dat_an <- dat_an |>                    
+      mutate(                            
+          # Total recall = IMRC + DLRC   
+          R8TR  = R8IMRC  + R8DLRC,     
+          R10TR = R10IMRC + R10DLRC,
+          R11TR = R11IMRC + R11DLRC,     
+          R12TR = R12IMRC + R12DLRC,     
+          R13TR = R13IMRC + R13DLRC,     
+        # Z-scored total recall (within wave)                                 
+          R8TR_Z=(R8TR  - mean(R8TR, na.rm = TRUE)) / sd(R8TR,na.rm =TRUE),
+          R10TR_Z=(R10TR - mean(R10TR, na.rm = TRUE)) / sd(R10TR, na.rm = TRUE),
+          R11TR_Z=(R11TR - mean(R11TR, na.rm = TRUE)) / sd(R11TR, na.rm = TRUE),
+          R12TR_Z=(R12TR - mean(R12TR, na.rm = TRUE)) / sd(R12TR, na.rm = TRUE),
+          R13TR_Z=(R13TR - mean(R13TR, na.rm = TRUE)) / sd(R13TR, na.rm = TRUE),
+        # Z-scored SER7 (within wave)
+          R8SER7_Z = (R8SER7 - mean(R8SER7, na.rm = TRUE)) / sd(R8SER7,
+            na.rm = TRUE),
+          R10SER7_Z = (R10SER7 - mean(R10SER7, na.rm = TRUE)) / sd(R10SER7, 
+            na.rm = TRUE),
+          R11SER7_Z = (R11SER7 - mean(R11SER7, na.rm = TRUE)) / sd(R11SER7, 
+            na.rm = TRUE),
+          R12SER7_Z = (R12SER7 - mean(R12SER7, na.rm = TRUE)) / sd(R12SER7,
+            na.rm = TRUE),
+          R13SER7_Z = (R13SER7 - mean(R13SER7, na.rm = TRUE)) / sd(R13SER7, 
+            na.rm = TRUE)
+      )
+
+
+# Race and Ethnicity
+ dat_an <- dat_an |>                 
+      mutate(                       
+          Race_etn = case_when(       
+              RAHISPAN == 1 ~ "Hispanic",                         
+              RARACEM == 1  ~ "Non-Hispanic White",               
+              RARACEM == 2  ~ "Non-Hispanic Black",               
+              RARACEM == 3  ~ "Non-Hispanic Other"
+          )
+      )
+
+# Comorbidity index
+ dat_an <- dat_an |>                 
+      mutate(                         
+          comob_ind_w8  = R8HIBPE  + R8DIABE + R8CANCRE  + R8LUNGE + R8HEARTE  + R8STROKE  + R8PSYCHE  + R8ARTHRE,
+          comob_ind_w10 = R10HIBPE + R10DIABE + R10CANCRE + R10LUNGE + R10HEARTE + R10STROKE + R10PSYCHE + R10ARTHRE,                          
+          comob_ind_w11 = R11HIBPE + R11DIABE + R11CANCRE + R11LUNGE +
+            R11HEARTE + R11STROKE + R11PSYCHE + R11ARTHRE,
+          comob_ind_w12 = R12HIBPE + R12DIABE + R12CANCRE + R12LUNGE +
+            R12HEARTE + R12STROKE + R12PSYCHE + R12ARTHRE,
+          comob_ind_w13 = R13HIBPE + R13DIABE + R13CANCRE + R13LUNGE +
+            R13HEARTE + R13STROKE + R13PSYCHE + R13ARTHRE
+      )
+
+head(dat_an)
+names(dat_an)
+dim(dat_an)
+```
+
+
+## Exclusion
+
+- Participants without exposure and outcomes data at baseline (Wave 8)  
+- Participants who reported a doctor-diagnosed memory-related disease at baseline (Wave 8)  
+
+
+```{r}
+
+```
+
+
+
+## Change into long format
+
+```{r}
+# check excluded number
+nrow(dat_an)  # 45234 (Before exclusion)     
+# (26,765 excluded)          
+nrow(dat_an |> filter(!is.na(R8MEMRYE))) # 18469 remain
+# (978 excluded)
+nrow(dat_an |> filter(R8MEMRYE == 0)) # 17491 remain 
+# (10,304 excluded)
+nrow(dat_an |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB))) # 7187 remain
+# (90 excluded)
+nrow(dat_an |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
+                    !is.na(R8IMRC))) # remain 7097
+nrow(dat_an |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
+                    !is.na(R8IMRC), !is.na(R8DLRC))) # remain 7097
+nrow(dat_an |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
+                    !is.na(R8IMRC), !is.na(R8DLRC),!is.na(R8SER7) ))
+                    # remain 7097
+
+
+dat_an_ex <- dat_an |> 
+    filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
+            !is.na(R8IMRC), !is.na(R8DLRC),!is.na(R8SER7))
+
+dim(dat_an_ex)
+
+table(dat_an$R8LBHOUSEPRB, useNA = "always")
+# Wave 8でhouseing stressがある人のwave 10, 11, 12, 13での状況
+dat_an |> 
+  filter(!is.na(R8LBHOUSEPRB)) |> 
+  summarise(
+    w10_housing = sum(!is.na(R10LBHOUSEPRB)),
+    w11_housing = sum(!is.na(R11LBHOUSEPRB)),
+    w12_housing = sum(!is.na(R12LBHOUSEPRB)),
+    w13_housing = sum(!is.na(R13LBHOUSEPRB))
+  ) |> view()
+
+dat_an |> 
+  filter(!is.na(R8LBHOUSEPRB)) |> 
+  summarise(
+    w14_housing = sum(!is.na(R14LBHOUSEPRB))
+  )
+
+
+# check num of w8 parricipants
+## 18469
+## No data in R8MEMRYE -> No data other variables
+sum(!is.na(dat_an$R8MEMRYE)) # 18469 : w8 participants
+sum(is.na(dat_an$R8MEMRYE)) # 26765: did not participante in w8
+sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8LBHOUSEPRB)) # 0
+sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8IMRC)) # 0
+sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8DLRC)) # 0
+sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8SER7)) # 0
+
+
+
+
+```
+
+
+
+
+## supplemental analysis
 ```{r}
 
 view(dat |> filter(dat$HHIDPN == 10001010) |> select(contains("DLRC")))
