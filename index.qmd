@@ -140,7 +140,9 @@ bibliography: references.bib
 
         -   follow-up
 
-            -   from wave 8 to wave 13 (2006-2016): 10 years
+            -   from wave 8 to wave 12 (2006-2014): 8 years
+                -   With that much missingness
+                    -   at wave 14 (next follow-up from wave 12), “12-year effect” can quietly become the effect among a selected subset (healthier, wealthier, less stressed, more stable housing, more likely to survive/respond), because at wave 14, non-NA data for exposure was 2800, which meant that 62% were missing from wave 8 (n=7422).
 
         -   Exclusion criteria
 

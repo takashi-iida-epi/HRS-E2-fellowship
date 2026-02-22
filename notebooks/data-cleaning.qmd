@@ -102,38 +102,7 @@ names(dat |> select(list_id_husplb, list_IMRC))
 ```
 
 
-# delete later
-```{r}
 
-view(dat |> filter(dat$HHIDPN == 10001010) |> select(contains("HOUSEPRB")))
-
-table(dat$R16LBHOUSEPRB, useNA = "ifany") 
-table(dat$S16LBHOUSEPRB, useNA = "ifany")# one example among several 
-
-## Ongoing housing preoblems: Categorical variables
-table(dat$R12LBHOUSEPRB, useNA = "ifany") 
-table(dat$S12LBHOUSEPRB, useNA = "ifany")# one example among several waves
-prop.table(table(dat$R12LBHOUSEPRB))
-
-# check cols for Ongoing housing preoblems
-dat %>% select(contains("HOUSEPRB"))
-dim(dat %>% select(contains("HOUSEPRB")))
-names(dat %>% select(contains("HOUSEPRB")))
-
-# Number of completed interviews per wave
-colSums(!is.na(dat %>% select(contains("HOUSEPRB"))))
-
-# Total number of completed interviews (all waves combined)
-sum(dat %>% select(contains("HOUSEPRB")), na.rm = TRUE)
-
-# integrate into vector
-all_house_values <- unlist(dat %>% select(contains("HOUSEPRB")))
-
-# distribution
-table(all_house_values, useNA = "ifany")
-
-# proportion
-prop.table(table(all_house_values))
 ```
 
 
@@ -409,7 +378,11 @@ dat_an <- dat_an |>
               RARACEM == 1  ~ "Non-Hispanic White",               
               RARACEM == 2  ~ "Non-Hispanic Black",               
               RARACEM == 3  ~ "Non-Hispanic Other"
-          )
+          ) |> 
+        factor(levels = c("Non-Hispanic White", 
+                            "Non-Hispanic Black",
+                            "Hispanic",
+                            "Non-Hispanic Other")) 
       )
 
 # Comorbidity index
@@ -436,16 +409,8 @@ dim(dat_an)
 - Participants without exposure and outcomes data at baseline (Wave 8)  
 - Participants who reported a doctor-diagnosed memory-related disease at baseline (Wave 8)  
 
-
 ```{r}
 
-```
-
-
-
-## Change into long format
-
-```{r}
 # check excluded number
 nrow(dat_an)  # 45234 (Before exclusion)     
 # (26,765 excluded)          
@@ -470,22 +435,6 @@ dat_an_ex <- dat_an |>
 
 dim(dat_an_ex)
 
-table(dat_an$R8LBHOUSEPRB, useNA = "always")
-# Wave 8でhouseing stressがある人のwave 10, 11, 12, 13での状況
-dat_an |> 
-  filter(!is.na(R8LBHOUSEPRB)) |> 
-  summarise(
-    w10_housing = sum(!is.na(R10LBHOUSEPRB)),
-    w11_housing = sum(!is.na(R11LBHOUSEPRB)),
-    w12_housing = sum(!is.na(R12LBHOUSEPRB)),
-    w13_housing = sum(!is.na(R13LBHOUSEPRB))
-  ) |> view()
-
-dat_an |> 
-  filter(!is.na(R8LBHOUSEPRB)) |> 
-  summarise(
-    w14_housing = sum(!is.na(R14LBHOUSEPRB))
-  )
 
 
 # check num of w8 parricipants
@@ -499,169 +448,98 @@ sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8DLRC)) # 0
 sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8SER7)) # 0
 
 
+# check House problems follow-up for subgroup 
+dat_an |> 
+  filter(!is.na(R8LBHOUSEPRB)) |> 
+  summarise(
+    w8_housing = sum(!is.na(R8LBHOUSEPRB)), # 7422
+    w10_housing = sum(!is.na(R10LBHOUSEPRB)), # 5319
+    w11_housing = sum(!is.na(R11LBHOUSEPRB)), # 1 (no f/u subgrp )
+    w12_housing = sum(!is.na(R12LBHOUSEPRB)), # 4450
+    w13_housing = sum(!is.na(R13LBHOUSEPRB)), # 3
+    w14_housing = sum(!is.na(R14LBHOUSEPRB)) # 2800
+  ) 
 
 
 ```
 
 
 
+## Change into long format
 
-## supplemental analysis
+Use wave 8, 10, 12
+
 ```{r}
 
-view(dat |> filter(dat$HHIDPN == 10001010) |> select(contains("DLRC")))
+# Wave 8, 10, 12
+waves <- c(8, 10, 12)
 
-dat_ex_R <- dat |> 
-    select("HHIDPN", "R8LBHOUSEPRB", "R8DLRC", "R10DLRC", "R11DLRC", 
-    "R12DLRC", "R13DLRC") 
-head(dat_ex)
-dim(dat_ex)
+# long format
+dat_long <- map_dfr(waves, function(w) {
+  dat_an_ex |> 
+    transmute(
+      HHIDPN,
+      wave = w,
 
-dat_ex |> 
-    group_by(R8LBHOUSEPRB) |> 
-    summarise(
-        mean_delayed_recall = mean(R8DLRC, na.rm = TRUE),
-    n = n()
+      # Time-invariant
+      sex       = RAGENDER,
+      race      = RARACEM,
+      hispanic  = RAHISPAN,
+      education = RAEDUC,
+      race_etn  = Race_etn,
+
+      # Exposure
+      housing_stress = get(paste0("R", w, "LBHOUSEPRB")),
+
+      # Outcomes
+      imrc        = get(paste0("R", w, "IMRC")),
+      dlrc        = get(paste0("R", w, "DLRC")),
+      ser7        = get(paste0("R", w, "SER7")),
+      total_recall = get(paste0("R", w, "TR")),
+      total_recall_z = get(paste0("R", w, "TR_Z")),
+      ser7_z      = get(paste0("R", w, "SER7_Z")),
+
+      # Confounders
+      age         = get(paste0("R", w, "AGEY_B")),
+      income      = get(paste0("H", w, "ITOT")),
+      smoking     = get(paste0("R", w, "SMOKEN")),
+      comorbidity_index = get(paste0("comob_ind_w", w))
     )
+}) |> 
+  arrange(HHIDPN, wave)
 
-dat_ex |> 
-    group_by(S8LBHOUSEPRB) |> 
-    summarise(
-        mean_delayed_recall = mean(S8DLRC, na.rm = TRUE),
-        n = n()
-    )
-
-    dat_ex |> 
-    group_by(S15LBHOUSEPRB) |> 
-    summarise(
-        mean_delayed_recall = mean(S15DLRCP, na.rm = TRUE),
-        n = n()
-    )
-
-dat_ex_R <- dat_ex_R |> 
-    drop_na("HHIDPN", "R8LBHOUSEPRB", "R8DLRC", "R10DLRC", "R11DLRC", 
-    "R12DLRC", "R13DLRC")
-dim(dat_ex_R)
-dat_ex_R |> 
-    group_by(R8LBHOUSEPRB) |> 
-    summarise(
-        mean_dlrc_w8 = mean(R8DLRC, na.rm = TRUE),
-        mean_dlrc_w10 = mean(R10DLRC, na.rm = TRUE),
-
-        mean_dlrc_w11 = mean(R11DLRC, na.rm = TRUE),
-        mean_dlrc_w12 = mean(R12DLRC, na.rm = TRUE),
-        mean_dlrc_w13 = mean(R13DLRC, na.rm = TRUE),
-        n = n()
-    )
-dim(dat_ex_R)
-
-library(ggplot2)
-library(tidyr)
-
-# データを作成して、long形式に変換
-plot_data <- dat_ex_R |> 
-    group_by(R8LBHOUSEPRB) |> 
-    summarise(
-        mean_dlrc_w8 = mean(R8DLRC, na.rm = TRUE),
-        mean_dlrc_w10 = mean(R10DLRC, na.rm = TRUE),
-        mean_dlrc_w11 = mean(R11DLRC, na.rm = TRUE),
-        mean_dlrc_w12 = mean(R12DLRC, na.rm = TRUE),
-        mean_dlrc_w13 = mean(R13DLRC, na.rm = TRUE),
-        n = n()
-    ) |>
-    pivot_longer(
-        cols = starts_with("mean_dlrc"),
-        names_to = "wave",
-        values_to = "mean_dlrc"
-    ) |>
-    mutate(
-        wave_num = case_when(
-            wave == "mean_dlrc_w8" ~ 8,
-            wave == "mean_dlrc_w10" ~ 10,
-            wave == "mean_dlrc_w11" ~ 11,
-            wave == "mean_dlrc_w12" ~ 12,
-            wave == "mean_dlrc_w13" ~ 13
-        ),
-        R8LBHOUSEPRB = factor(R8LBHOUSEPRB)
-    )
-
-# 折れ線グラフ作成
-ggplot(plot_data, aes(x = wave_num, y = mean_dlrc, 
-                       color = R8LBHOUSEPRB, 
-                       group = R8LBHOUSEPRB)) +
-    geom_line(linewidth = 1) +
-    geom_point(size = 3) +
-    labs(
-        title = "Mean DLRC Score by Housing Problem Status",
-        x = "Wave",
-        y = "Mean DLRC Score",
-        color = "Housing Problem"
-    ) +
-    scale_x_continuous(breaks = c(8, 10, 11, 12, 13)) +
-    theme_minimal()
+# 
+dim(dat_long)  # 21291    18
+head(dat_long, 21)
 ```
+
 
 ```{r}
-dat_ex_R_ser7 <- dat |>
-    select(HHIDPN, R8LBHOUSEPRB, R8SER7, R10SER7, R11SER7,
-    R12SER7, R13SER7) |>
-    drop_na()
 
-table(dat_ex_R_ser7$R8LBHOUSEPRB, dat_ex_R_ser7$R8SER7)
-
-
-dim(dat_ex_R_ser7)
-dat_ex_R_ser7 |>
-    group_by(R8LBHOUSEPRB) |>
-    summarise(
-        mean_ser7_w8 = mean(R8SER7, na.rm = TRUE),
-        mean_ser7_w10 = mean(R10SER7, na.rm = TRUE),
-        mean_ser7_w11 = mean(R11SER7, na.rm = TRUE),
-        mean_ser7_w12 = mean(R12SER7, na.rm = TRUE),
-        mean_ser7_w13 = mean(R13SER7, na.rm = TRUE),
-        n = n()
+# exposure -> dichotomized
+# 0 = No housing problem
+# 1 = Yes, any housing problem (2+3+4)
+dat_long <- dat_long |> 
+  mutate(
+    housing_stress_bin = ifelse(housing_stress == 1, 0, 1)
     )
 
-# データを作成して、long形式に変換
-plot_data_ser7 <- dat_ex_R_ser7 |>
-    group_by(R8LBHOUSEPRB) |>
-    summarise(
-        mean_ser7_w8 = mean(R8SER7, na.rm = TRUE),
-        mean_ser7_w10 = mean(R10SER7, na.rm = TRUE),
-        mean_ser7_w11 = mean(R11SER7, na.rm = TRUE),
-        mean_ser7_w12 = mean(R12SER7, na.rm = TRUE),
-        mean_ser7_w13 = mean(R13SER7, na.rm = TRUE),
-        n = n()
-    ) |>
-    pivot_longer(
-        cols = starts_with("mean_ser7"),
-        names_to = "wave",
-        values_to = "mean_ser7"
-    ) |>
-    mutate(
-        wave_num = case_when(
-            wave == "mean_ser7_w8" ~ 8,
-            wave == "mean_ser7_w10" ~ 10,
-            wave == "mean_ser7_w11" ~ 11,
-            wave == "mean_ser7_w12" ~ 12,
-            wave == "mean_ser7_w13" ~ 13
-        ),
-        R8LBHOUSEPRB = factor(R8LBHOUSEPRB)
-    )
 
-# 折れ線グラフ作成
-ggplot(plot_data_ser7, aes(x = wave_num, y = mean_ser7,
-                       color = R8LBHOUSEPRB,
-                       group = R8LBHOUSEPRB)) +
-    geom_line(linewidth = 1) +
-    geom_point(size = 3) +
-    labs(
-        title = "Mean SER7 Score by Housing Problem Status",
-        x = "Wave",
-        y = "Mean SER7 Score",
-        color = "Housing Problem"
-    ) +
-    scale_x_continuous(breaks = c(8, 10, 11, 12, 13)) +
-    theme_minimal()
+# number of participants experienced Housing stress more than 1 wave
+dat_long |> 
+  group_by(HHIDPN) |> 
+  summarise(ever_stress = max(housing_stress_bin, na.rm = TRUE)) |> 
+  summarise(n_ever_stress = sum(ever_stress == 1))
+
+table(dat_long$housing_stress_bin, useNA = "always")
 ```
 
+
+## Save data
+
+```{r}
+getwd()
+
+saveRDS(dat_an_ex, "dat_an_ex.rds")
+saveRDS(dat_long,  "dat_long.rds")
+```
