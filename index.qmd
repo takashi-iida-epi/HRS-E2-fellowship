@@ -11,98 +11,109 @@ bibliography: references.bib
 
 ### hypothesis
 
--   we hypothesize that greater housing stress will be associated with accelerated cognitive decline across multiple domains.
+-   
 
 -   Furthermore, I expect housing stress to differentially affect specific cognitive domains, though the pattern of domain-specific effects will be explored.
 
 ### Pragraph 1
 
--   (what is it?)
+(what is it?)
 
-    -   definitions
+-   definitions
 
-        -   Housing is a major pathway through which health disparities emerge and are sustained over time. This review offers a conceptual model for the relationship between housing and health equity, identifying key aspects of housing that relate to health, assessing exposure disparities, and demonstrating the origins of this unequal exposure in structural inequality. [@Swope2019-gm]
+    -   What is the housing stress
 
-        -   Then, we organize the following terms according to three overarching and inter-related concepts often used in housing research and policy to demarcate the key elements of housing: affordability, suitability and security[@Mansour2022-ai]
+        -   Housing is one of the causes of health disparities. [@Swope2019-gm]
 
-    -   key mechanisms, theories
+        -   In WHO's framing for action on the social determinants of health in 2010, housing was categorized into intermediary determinants of health, which are more downstream factors than social determinants of health. [@Solar2010-ix]
 
-        -   domains of cognitive functions
+        -   The key elements of housing consist of affordability, suitability and security. [@Mansour2022-ai]
 
-            -   Episodic memory
+        -   If those elements are not sustained, residents may face housing problems, such as homelessness, housing instability, and foreclosure.
 
-                -   Most tests measuring verbal episodic memory reported very good predictive accuracy (all above 0.7) and there was little variability related to the test condition (e.g., delayed or immediate, with or without oriented encoding, with or without cues at recall) or the particular material (e.g., words or paragraph)
+        -   In fact, the number of people facing housing problems are many and growing.
 
-                -   Both meta-analytic and qualitative examination of AD versus healthy control (HC) studies (*n* = 47) revealed generally high sensitivity and specificity (≥ 80% for AD comparisons) for measures of immediate (sensitivity = 87%, specificity = 88%) and delayed memory (sensitivity = 89%, specificity = 89%), especially those involving word-list recall. Results confirm that memory mea- sures have high diagnostic accuracy for identification of AD, are promising but require further refinement for identification of MCI, and provide support for ongoing investigation of neuro- psychological assessment as a cognitive biomarker of preclini- cal AD. [@Weissberger2017-vb]
+            -   More than one third of community-living older Americans experience at least one form of housing insecurity (e.g. poor housing affordability, poor housing quality, and poor neighborhood quality). [@Paredes2024-zz]
 
-            -   Working memory
+            -   In 2024, more than 700,000 people experienced homelessness in the United States, which was the largest number since 2007. [@De_Sousa2024-br]
 
-                -   which part is important for dementia/AD
-                -   AD participants performed significantly worse than the nonimpaired age-matched adults on all three tasks of attentional control, whereas MCI participants performed worse than nonimpaired controls just on the Brown-Peterson procedure when there was a 30-second delayed recall. [@Kirova2015-ix]
-                -   Working memory deficits are a recognized feature of Alzheimer’s disease (AD). They are commonly ascribed to central executive impairment and assumed to relate to frontal lobe dysfunction. [@Stopford2012-bs]
+        -   In particular, older adults may be vulnerable to housing problems.
 
-    -   Effect measure modification
+            -   The number of older people, especially people aged 65+, is estimated to grow rapidly. [@Culhane_undated-tn]
 
-        -   In addition, some papers mentioned that women tent do have higher memory, but have faster cognitive decline than men.
+        -   Housing problems may also cause community level difficulties.
 
-            -   Women tend to score higher on immediate and delayed word recall among older age. [@Golchert2019-un]
+            -   If the foreclosure rate of a community increases, the local government will reduce property tax as a revenue. [@Apgar2005-td]
 
-            -   Women had significantly higher baseline performance than men in global cognition, executive function, and memory. Compared with men, women had significantly faster declines in global cognition and executive function. However, men and women had similar declines in memory. [@Levine2021-pj]
-
-        -   Housing stress may affect cognitive function.
-
-        -   Also, recently occurring stressful life events reported was associated with greater memory decline later life in women but not in men. [@Munro2019-dx]
-
-        -   So, there is a possiblity that women are more vulnerable to housing stress.
-
-        -   so, we will examine the effect measure modification by sex
-
--   (Why does the issue matter?)
-
-    -   disease distribution
-
-        -   the number of people who encounter housing instability effect measure modification
-            -   On a single night in January 2024, 771,480 people experienced homelessness in the United States, the largest number since data collection began and an overall increase of 19 percent since 2007. Compared with 2007, 124,222 more people experienced homelessness [@De_Sousa2024-br]
-        -   the number of people who develop dementia/ AD
-
-    -   adverse consequences/benefits
-
-        -   mid-file and late life cognitive functions are associated with AD risks. [@Dhana2025-pq]
-
-        -   People with MCI have a ten-fold higher risk of progressing to dementia every year than people of the same age in the general population. Thus, many people with MCI are actually in a prodromal stage of AD. However, not all patients with MCI progress to dementia and it is thus critical for clinicians to identify tools that can accurately separate those who will remain stable from those who will progress to dementia. [@Belleville2017-sr]
-
-    -   policy agenda
+            -   Neighborhood eviction linked to community harm and higher neighborhood crime. [@Schwartz2024-po]
 
 ### Pragraph 2
 
--   (what do we know about the issue?)
+-   key mechanisms, theories
 
-    -   One study showed that better housing quality is positively associated with higher executive function (EF) skills. [@Vaid2024-my]
-    -   Foreclosure may endanger older adults’ memory. [@Kim2024-se]
-    -   Housing distress was also associated with increased risk of cognitive impairment (RR = 1.20, 95% CI: 1.05, 1.36) [@Wilkinson2026-wu]
-    -   
+    -   Those housing problems affect mental for residents, and lead to stress. [@Talmatzky2026-dy; @Singh2019-qo; @Dotsikas2023-ex]
 
-### Pragraph 3
+    -   These housing stress may cause some adverse health outcomes.
 
--   (what do we not know about the issue?) ​​
+        -   One systematic review suggested that housing disadvantage may impact mental health. [@Singh2019-qo]
 
-    -   the evidence of the causal effect of housing stress on cognitive decline is still not enough
-    -   few have investigated detailed cognitive assessments such as immediate and delayed word recall, serial subtraction, and object naming tasks.
-        -   which memory domains are damaged more by ongoing housing stress
-        -   can show rate of cognitive function decline over time, rather than one point outcome (cognitive impairment yes or no)
+            -   Experiencing housing problems was associated with depression. [@Kingsbury2018-yp]
+            -   Perceived risk of eviction associated with anxiety/depression and related medication use. [@Acharya2022-ux]
 
--   (how studying the exposure of interest could shed light on potential interventions that could help reduce the risk of the outcome. )
+        -   Another paper reported housing instability was associated with adverse cardiometabolic outcomes. [@Gu2023-xz]
+
+    -   Emerging evidence also suggests housing stress may accelerate memory decline and increase dementia risk.
+
+        -   For example, foreclosure may endanger older adults’ memory and may be a cause of a faster cognitive decline. [@Kim2024-se, Friedman2021-jz]
+
+### Paragraph 3
+
+-   Given cognitive declines in mid-file and late life are associated with dementia and Alzheimer’s disease risks, it is important to detect factors of cognitive decline. [@Dhana2025-pq; @Belleville2017-sr]
+
+-   Cognitive decline is not uniform across domains; episodic memory and working memory are especially relevant to dementia and Alzheimer’s disease.
+
+    -   Episodic memory, which assessed using immediate and delayed word recall, shows high diagnostic accuracy for Alzheimer’s disease and is widely studied as an early cognitive marker. \[\@Weissberger2017-vb\]
+
+    -   Working memory, reflecting attentional control and central executive function, is also frequently impaired in Alzheimer’s disease. \[\@Kirova2015-ix; Stopford2012-bs\]
+
+    -   Thus, these domains are clinically meaningful to evaluate whether housing-related stressors translate into dementia-relevant cognitive changes.
+
+-   Effect measure modification
+
+    -   some papers show different responses of cognitive decline caused by chronic stress between men or women.
+
+        -   Women tend to score higher on immediate and delayed word recall among older age. [@Golchert2019-un]
+
+        -   As for speed of cognitive decline, women may have faster declines in global cognition and executive function, compared with men. [@Levine2021-pj]
+
+        -   Also, recently occurring stressful life events reported was associated with greater memory decline later life in women but not in men. [@Munro2019-dx]
 
 ### Pragraph 4
 
+-   (what do we know about the issue?)
+
+    -   Past studies have identified that housing stress may key cause of cognitive impairement.
+        -   One study showed that better housing quality is positively associated with higher executive function (EF) skills. [@Vaid2024-my]
+        -   Housing distress was also associated with increased risk of cognitive impairment. [@Wilkinson2026-wu]
+
+### Pragraph 5
+
+-   (what do we not know about the issue?) ​​
+
+    -   However, the evidence of the causal effect of housing stress on cognitive decline is still not enough. [@Walsh2025-hj]
+    -   Especially, few studies have investigated detailed cognitive assessments for episodic memory and working memory.
+    -   In addition, it have not been examined well about gender differences of cognitive decline caused by housing stress
+
 -   (How does this paper address what we do not know?)
 
-    -   Therecore, this research addresses this gap by examining the average effect of ongoing housing stress on multiple cognitive domains(Episodic memory and Working memory) among people aged 50 and older in the United States
+    -   Therecore, this research addresses this gap by examining the average effect of ongoing housing stress on episodic memory and working memory among people aged 50 and older in the United States.
+    -   The secondary purpose of this study is examining effect measure modification by sex which may cause different cognitive decline speed between men and women.
 
--   (what is your research question)
+-   (hypothesis)
 
-    -   My research question is examining the average causal effect of ongoing housing stress on multiple cognitive domains(**Episodic Memory** and **Working Memory**) among adults aged 50 and older in the United States.
-    -   
+    -   we hypothesize that greater housing stress will be associated with accelerated cognitive decline for both episodic and working memory.
+
+    -   Furthermore, women may have faster cognitive decline caused by housing stress.
 
 ::: {.callout-note collapse="true"}
 ## I need to check citation papers

@@ -1,0 +1,20 @@
+---
+title: "Ongoing Housing stress and cognitive functions - manuscript"
+author: "Takashi Iida"
+format:
+  html: default
+  docx: default
+bibliography: references.bib
+---
+
+## Introduction
+
+Housing is a recognized driver of health disparities [@Swope2019-gm]. In the World Health Organization's 2010 framework, housing was classified as an intermediary determinant of health—downstream from structural forces yet directly shaping health outcomes [@Solar2010-ix]. Its three key elements; affordability, suitability, and security [@Mansour2022-ai], when unmet, expose residents to homelessness, housing instability, and foreclosure. Housing insecurity in the United States is widespread and growing: more than one third of community-living older Americans report at least one form of it, including poor affordability, poor quality, or poor neighborhood conditions [@Paredes2024-zz]. In 2024, more than 700,000 people experienced homelessness—the highest count since 2007 [@De_Sousa2024-br]. Older adults face particular vulnerability, and the population aged 65 and older is projected to grow rapidly in coming decades [@Culhane_undated-tn]. Housing problems also harm communities: rising foreclosure rates erode local property tax revenues [@Apgar2005-td], and neighborhood eviction is linked to higher crime rates [@Schwartz2024-po].
+
+Housing problems generate chronic psychological stress [@Talmatzky2026-dy; @Singh2019-qo; @Dotsikas2023-ex], which contributes to several adverse health outcomes. Housing disadvantage is associated with poor mental health [@Singh2019-qo], depression [@Kingsbury2018-yp], and—for those who perceive a risk of eviction—anxiety and related medication use [@Acharya2022-ux]. Housing instability also predicts adverse cardiometabolic outcomes [@Gu2023-xz]. 
+
+Emerging evidence further suggests that housing stress may accelerate memory decline: foreclosure, for example, has been associated with faster cognitive decline among older adults [@Kim2024-se; @Friedman2021-jz]. Cognitive decline in midlife and late life increases the risk of dementia and Alzheimer's disease [@Dhana2025-pq; @Belleville2017-sr], making it important to identify modifiable contributing factors. Cognitive decline varies by domain; two domains especially relevant to Alzheimer's disease are episodic memory and working memory. Episodic memory, assessed through immediate and delayed word recall, is an early cognitive marker with high diagnostic accuracy for Alzheimer's disease [@Weissberger2017-vb]. Working memory, which reflects attentional control and central executive function, is also commonly impaired in Alzheimer's disease [@Kirova2015-ix; @Stopford2012-bs]. Studying these domains clarifies whether housing-related stressors contribute to dementia-relevant cognitive change.
+
+The cognitive effects of housing stress may also differ by sex. Women score higher on immediate and delayed word recall in older age [@Golchert2019-un] yet decline faster in global cognition and executive function than men [@Levine2021-pj]. Moreover, stressful life events are associated with greater late-life memory decline in women but not in men [@Munro2019-dx], suggesting that sex may modify the cognitive effects of stress.
+
+Prior research links housing conditions to cognitive health. Better housing quality predicts higher executive function [@Vaid2024-my], and housing distress is associated with increased cognitive impairment risk [@Wilkinson2026-wu]. However, whether housing stress causally contributes to cognitive decline remains unclear [@Walsh2025-hj]. Few studies assess episodic and working memory separately, and sex differences in these effects remain poorly characterized. This study examines the effect of ongoing housing stress on episodic and working memory trajectories among U.S. adults aged 50 and older. We also examine whether sex modifies this association, given that women may experience faster stress-related cognitive decline. We hypothesize that greater housing stress accelerates cognitive decline in both domains, with stronger effects among women than men.
