@@ -1,0 +1,106 @@
+---
+title: "Table 1"
+author: "Takashi Iida"
+format: html
+html-table-processing: none
+---
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false	
+
+library(tidyverse)
+library(haven)
+library(gtsummary)
+library(flextable)
+```
+
+
+
+```{r}
+#| echo: false
+
+
+# getwd()
+
+base_directory <- "/Users/iidatakashi/Documents/Git/HRS-E2-fellowship/data"
+
+setwd(base_directory)
+
+dat_long <- readRDS("dat_long.rds")
+```
+
+
+Table 1. Characteristics of Participants in the Health and Retirement Study by Housing Stress Status at baseline (Wave 8, 2006) (N=7,097)
+
+
+```{r}
+#| label: tbl-table1
+#| echo: false
+
+dat_long |>
+  filter(wave == 8) |> 
+  mutate(
+    housing_stress_bin = factor(
+      housing_stress_bin,
+      levels = c(1, 0),
+      labels = c("Housing Stress", "No Housing Stress")
+    ),
+    # sex -> factor
+    sex = factor(
+      sex,
+      levels = c(1, 2),
+      labels = c("Male", "Female")
+    ),
+    education = factor(
+      education,
+      levels = c(1,2,3,4,5), 
+      labels = c("Less than high school", "General Educational Diploma", "High school diplomas", "Some college", "College and above")
+    ),
+    # comorbidity_index, ser7 -> numeric
+    comorbidity_index = as.numeric(comorbidity_index),
+    ser7 = as.numeric(ser7)
+  ) |>
+  select(
+    housing_stress_bin,
+    age, sex, race_etn, education, income, smoking,
+    comorbidity_index,
+    imrc, dlrc, ser7
+  ) |>
+  tbl_summary(
+    by = housing_stress_bin,
+    statistic = list(
+      all_continuous()  ~ "{mean} ({sd})",
+      all_categorical() ~ "{n} ({p}%)",
+      income            ~ "{median} ({p25}, {p75})" 
+    ),
+    type = list(
+      comorbidity_index ~ "continuous",
+      ser7              ~ "continuous"
+    ),
+    label = list(
+      age               ~ "Age, mean(SD)(years)",
+      sex               ~ "Sex, n(%)",
+      race_etn          ~"Race and ethnicity, n(%)",
+      education         ~ "Education, n(%)",
+      income            ~ "Household income, median(IQR)($)",
+      smoking           ~ "Current smoker, n(%)",
+      comorbidity_index ~ "Comorbidity index (0–8), mean(SD)",
+      imrc              ~ "Immediate word recall (0–10), mean(SD)",
+      dlrc              ~ "Delayed word recall (0–10), mean(SD)",
+      ser7              ~ "Serial 7's (0–5), mean(SD)"
+    ),
+    missing = "no"
+  ) |>
+  add_overall() |>
+  modify_header(
+    stat_1 ~ "**Housing Stress**  \n(n = {n})",
+    stat_2 ~ "**No Housing Stress**  \n(n = {n})",
+    stat_0 ~ "**Overall**  \n(n = {n})"
+  ) |>
+  bold_labels() |> 
+  as_flex_table() |> 
+  set_table_properties(layout = "autofit", width = 1) 
+```

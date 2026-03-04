@@ -18,6 +18,7 @@ This document creates tables and figures for the manuscript.
 
 library(tidyverse)
 library(haven)
+library(gtsummary)
 ```
 
 ## Load clean data  
@@ -33,9 +34,86 @@ base_directory <- "/Users/iidatakashi/Documents/Git/HRS-E2-fellowship/data"
 
 setwd(base_directory)
 
-dat <- read_sas("randhrs1992_2022v1.sas7bdat")
+dat_long <- readRDS("dat_long.rds")
+head(dat_long)
 
+names(dat_long)
 ```
+
+
+## Table 1
+
+```{r}
+#| label: tbl-table1
+#| tbl-cap: "Table 1. Baseline characteristics at Wave 8 (2006), prior to multiple imputation. 
+#|   Values are mean (SD) for continuous variables and n (%) for categorical variables.
+#|   Missing data: income (XX%), smoking (XX%), comorbidity index (XX%)."
+dat_long |>
+  filter(wave == 8) |> 
+  mutate(
+    housing_stress_bin = factor(
+      housing_stress_bin,
+      levels = c(1, 0),
+      labels = c("Housing Stress", "No Housing Stress")
+    ),
+    # sex -> factor
+    sex = factor(
+      sex,
+      levels = c(1, 2),
+      labels = c("Male", "Female")
+    ),
+    education = factor(
+      education,
+      levels = c(1,2,3,4,5), 
+      labels = c("Less than high school", "General Educational Diploma", "High school diplomas", "Some college", "College and above")
+    ),
+    # comorbidity_index, ser7 -> numeric
+    comorbidity_index = as.numeric(comorbidity_index),
+    ser7 = as.numeric(ser7)
+  ) |>
+  select(
+    housing_stress_bin,
+    age, sex, race_etn, education, income, smoking,
+    comorbidity_index,
+    imrc, dlrc, ser7
+  ) |>
+  tbl_summary(
+    by = housing_stress_bin,
+    statistic = list(
+      all_continuous()  ~ "{mean} ({sd})",
+      all_categorical() ~ "{n} ({p}%)",
+      income            ~ "{median} ({p25}, {p75})" 
+    ),
+    type = list(
+      comorbidity_index ~ "continuous",
+      ser7              ~ "continuous"
+    ),
+    label = list(
+      age               ~ "Age, mean(SD)(years)",
+      sex               ~ "Sex, n(%)",
+      race_etn          ~"Race and ethnicity, n(%)",
+      education         ~ "Education, n(%)",
+      income            ~ "Household income, median(IQR)($)",
+      smoking           ~ "Current smoker, n(%)",
+      comorbidity_index ~ "Comorbidity index (0–8), mean(SD)",
+      imrc              ~ "Immediate word recall (0–10), mean(SD)",
+      dlrc              ~ "Delayed word recall (0–10), mean(SD)",
+      ser7              ~ "Serial 7's (0–5), mean(SD)"
+    ),
+    missing = "no"
+  ) |>
+  add_overall() |>
+  modify_header(
+    stat_1 ~ "**Housing Stress**  \n(n = {n})",
+    stat_2 ~ "**No Housing Stress**  \n(n = {n})",
+    stat_0 ~ "**Overall**  \n(n = {n})"
+  ) |>
+  bold_labels()
+```
+
+
+
+
 
 
 ## Multiple imputation
@@ -101,7 +179,7 @@ imp <- mice(
   print           = FALSE
 )
 
-# 確認
+# check
 summary(imp)
 plot(imp)
 ```
@@ -173,3 +251,43 @@ ggplot(res_plot, aes(x = estimate, y = outcome, color = outcome)) +
         axis.text.y   = element_text(size = 12))
 ```
 
+
+
+## DAG
+
+Description: This DAG illustrates the hypothesized relationship between housing stress (exposure) and cognitive decline (outcome). Demographic characteristics, health problems, social determinants of health (SDoH), and smoking status are included as covariates. Demographic characteristics are age, sex, and race and ethnicity. SDoH are education and household incomes. Health problems include hypertension, diabetes or high blood sugar, cancer or malignant tumor (excluding skin cancer), chronic lung disease (excluding asthma), heart disease (including heart attack, coronary heart disease, angina, congestive heart failure, or other heart problems), stroke or transient ischemic attack, emotional, nervous, or psychiatric problems, and arthritis or rheumatism.
+
+
+Abbreviations: DAG = Directed Acyclic Graph, SDoH = Social Determinants of Health
+
+
+```{dot}
+digraph DAG {
+  layout=neato;
+  node [shape=box, fontsize=12];
+  
+  Demographic     [label="Demographic",         pos="0,2!"];
+  Health_Problems [label="Health Problems",     pos="2,3!"];
+  SDoH            [label="SDoH",                pos="2,1!"];
+  Health_Behavior [label="Smoking Status",     pos="2,0!"];
+  Housing_Stress  [label="Housing Stress (X)",  pos="4,1.5!"];
+  Cognitive_Decline [label="Cognitive Decline (Y)", pos="6,1.5!"];
+  
+  Demographic -> Health_Problems;
+  Demographic -> SDoH;
+  Demographic -> Housing_Stress;
+  Demographic -> Cognitive_Decline;
+  
+  Health_Problems -> SDoH;
+  Health_Problems -> Housing_Stress;
+  Health_Problems -> Cognitive_Decline;
+  
+  SDoH -> Housing_Stress;
+  SDoH -> Cognitive_Decline;
+  
+  Health_Behavior -> Housing_Stress;
+  Health_Behavior -> Cognitive_Decline;
+  
+  Housing_Stress -> Cognitive_Decline;
+}
+```

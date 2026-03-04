@@ -97,13 +97,13 @@ names(dat %>% select(contains("HOUSEPRB")))
 # select person_id,  House problem from w8 to w13
 # make lists 
 list_id_husplb <- c("HHIDPN", "R8LBHOUSEPRB", "R10LBHOUSEPRB","R11LBHOUSEPRB", "R12LBHOUSEPRB", "R13LBHOUSEPRB", "R14LBHOUSEPRB" )
-names(dat |> select(list_id_husplb, list_IMRC))
+# names(dat |> select(list_id_husplb, list_IMRC))
 
 ```
 
 
 
-```
+
 
 
 ## Outcome-exploration
@@ -116,6 +116,7 @@ names(dat |> select(list_id_husplb, list_IMRC))
 - Wave 9 (2008) was excluded from the analysis as housing stress data were not collected in that wave
 
 ```{r}
+
 #| label: outcome-exploration
 #| echo: false
 
@@ -130,7 +131,9 @@ list_DLRC <- c("R8DLRC","R10DLRC","R11DLRC", "R12DLRC", "R13DLRC")
 # Series 7s
 names(dat |> select(contains("SER7")))
 list_SER7 <- c("R8SER7","R10SER7","R11SER7", "R12SER7", "R13SER7")
+
 ```
+
 
 
 ## Confounding exploration
@@ -513,6 +516,19 @@ dim(dat_long)  # 21291    18
 head(dat_long, 21)
 ```
 
+# chekc num of housing stress between waves
+
+```{r}
+# check num of housing stress between waves
+## -> too small num of partcipants changing from 1->2~4
+## it might be difficult to chekc fixed effect in categorical housing stress
+dat_long %>%
+  select(HHIDPN, wave, housing_stress) %>%
+  pivot_wider(names_from = wave, values_from = housing_stress, 
+              names_prefix = "w") %>%
+  count(w8, w10, w12) %>%
+  arrange(desc(n)) 
+```
 
 ```{r}
 

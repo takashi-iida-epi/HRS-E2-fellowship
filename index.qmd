@@ -124,7 +124,7 @@ bibliography: references.bib
 
         -   We used the Health and Retirement Study (HRS), a nationally representative cohort of U.S. adults aged 50 and older. [@Sonnega2014-my]
 
-            -   The study focuses on older Americans, and followed approximately 20,000 participants in the United States over time. [@UnknownUnknown-jj]
+            -   The study focuses on older Americans, and followed approximately 20,000 participants in the United States over time.
 
             -   Initial HRS cohort were people born 1931 to 1941, and they were first interviewed in 1992 (wave 1). [@Bugliari2025-jb]
 
@@ -165,6 +165,8 @@ bibliography: references.bib
             -   This item was one of the ongoing chronic stressors, which was used to assess a respondent’s exposure and perception of common chronic stressors. [@Smith2023-xv]
 
             -   Responses indicate if a problem has lasted at least twelve months and how upsetting each problem has been using one of four categories, "1 = No, didn’t happen," "2 = Yes, but not upsetting," "3 = Yes, somewhat upsetting," or "4 = Yes, very upsetting."
+
+            -   We dichotomized responses into “yes” (categories 2–4) versus “no” (category 1).
         -   *Measurement*
             -   The respondent answer the level of housing stress through each wave (wave 8, 10, and 12) by self report.
 
@@ -216,7 +218,7 @@ bibliography: references.bib
 
         -   **Main Analysis:** Describe the models used to answer the research question (e.g., linear regression for mean outcome difference, logistic regression for odds ratio). Include how you will assess overall associations and any effect measure modifications (subgroups or interaction terms).
 
-            -   For main analysis, we used fixed-effect model estimating standardized mean differences (coefficients) with 95% Confidence Intervals (CIs). Model 1 was crude model, and model 2 was adjusted for age, total household income, and comorbidity index. Sex and education were not adjusted because fixed-effect models control for observed and unobserved time-invariant variables by using within-person variations. [@Allison2005-vm; @Quintana2021-ng]
+            -   For main analysis, we used individual fixed-effect model estimating standardized mean differences (coefficients) with 95% Confidence Intervals (CIs). Model 1 was crude model, and model 2 was adjusted for age, total household income, and comorbidity index. Sex and education were not adjusted because fixed-effect models control for observed and unobserved time-invariant variables by using within-person variations. [@Allison2005-vm; @Quintana2021-ng]
 
             -   For sub-group analysis, we stratified data by sex to examine effect measure modification by sex.
 
@@ -241,3 +243,17 @@ bibliography: references.bib
         -   Software
 
             -   We used R 4.5.1 for analysis.
+
+## Results
+
+-   Table 1 shows characteristics of participants by housing stress status at baseline.
+
+-   The final analytic sample included 7,097 participants: 732 reported housing stress and 6,365 did not.
+
+-   At baseline, participants had a mean age of 67 years (SD 11) and were predominantly female (59%).
+
+-   Compared with those without housing stress, participants with housing stress were younger (mean age 65 vs 68 years) and more often female (62% vs 59%).
+
+-   In the housing stress group, less-than-high-school education was more common (28% vs 16%), college or above was less common (13% vs 23%), median household income was lower (\$25,050 \[IQR \$12,526–\$47,050\] vs \$42,540 \[IQR \$22,896–\$80,520\]), current smoking was more prevalent (23% vs 12%), and comorbidity burden was higher (mean 2.26 vs 1.86).
+
+-   Baseline cognitive performance was lower in the housing stress group across all three cognitive test scores: immediate word recall (mean 5.23 vs 5.57), delayed word recall (4.05 vs 4.46), and Serial 7's (3.08 vs 3.70).
