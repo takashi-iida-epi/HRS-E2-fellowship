@@ -1,0 +1,246 @@
+---
+title: "Ongoing Housing Stress and Cognitive Decline Among Older U.S. Adults"
+author: "Takashi Iida"
+date: today
+format:
+  pdf:
+    fontsize: 12pt
+    geometry:
+      - top=1in
+      - bottom=1in
+      - left=1in
+      - right=1in
+  docx: default
+bibliography: references.bib
+csl: vancouver.csl
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+library(gtsummary)
+library(kableExtra)
+library(flextable)
+
+dat_long <- readRDS("/Users/iidatakashi/Documents/Git/HRS-E2-fellowship/data/dat_long.rds")
+```
+
+## Introduction
+
+Housing is a recognized intermediary social determinant of health that, when inadequate in affordability, quality, or security, exposes residents to chronic psychological stress and adverse health outcomes [@Swope2019-gm; @Solar2010-ix]. Housing insecurity affects more than one-third of community-dwelling older Americans and is growing nationally, with over 700,000 people experiencing homelessness in 2024—the highest count since 2007 [@Paredes2024-zz; @De_Sousa2024-br]. Housing stress has been associated with depression, cardiometabolic disease, and—emerging evidence suggests—cognitive decline: foreclosure, for example, has been linked to faster memory loss in older adults [@Kim2024-se; @Friedman2021-jz]. Because cognitive decline in midlife and late life elevates the risk of dementia and Alzheimer's disease [@Dhana2025-pq; @Belleville2017-sr], identifying modifiable contributors is a public health priority. Two memory domains particularly relevant to Alzheimer's disease are episodic memory—assessed through word recall and recognized as an early diagnostic marker [@Weissberger2017-vb]—and working memory, reflecting central executive function, which is commonly impaired in Alzheimer's disease [@Kirova2015-ix; @Stopford2012-bs].
+
+Despite growing interest, few longitudinal studies have examined whether ongoing housing stress specifically affects episodic or working memory trajectories, and sex differences in these effects remain poorly characterized—despite evidence that women may experience stronger stress-related cognitive decline than men [@Munro2019-dx; @Levine2021-pj]. Using a longitudinal trajectory approach, this study examines the domain-specific effects of ongoing housing stress on episodic memory and working memory separately among U.S. adults aged 50 and older, and assesses whether sex modifies this relationship. We hypothesize that housing stress accelerates decline in both memory domains, with stronger effects in women.
+
+## Methods
+
+### Data Source and Analytic Sample
+
+We used data from the Health and Retirement Study (HRS), a nationally representative biennial longitudinal cohort of approximately 20,000 U.S. adults aged 50 and older using multistage national probability sampling, which refreshes its cohort every six years [@Sonnega2014-my; @Fisher2018-cl; @Juster1995-oa]. Beginning in 2006, half the cohort was assigned to enhanced face-to-face interviews every four years that included a psychosocial questionnaire; all participants received these enhanced interviews at least every four years. We defined Wave 8 (2006) as baseline because the ongoing housing stress item was first introduced in that year [@Smith2023-xv], and followed participants through Wave 10 (2010) and Wave 12 (2012), yielding up to three observations per person. We restricted the sample to primary respondents (excluding spouses and partners) to avoid within-household clustering from shared housing environments. Participants were excluded if they had a physician-diagnosed memory-related disease at baseline or were missing exposure or outcome data at baseline. The final analytic sample comprised 7,097 participants (Figure 1).
+
+### Exposure
+
+Ongoing housing stress was assessed at each wave (2006, 2010, 2012) through a self-reported item in the HRS Psychosocial and Lifestyle Questionnaire, administered during enhanced face-to-face interviews [@Smith2023-xv]. Respondents indicated whether a housing problem had persisted for at least 12 months and, if so, how upsetting it had been, using a four-category scale ranging from 'did not happen' to 'very upsetting.' Responses were dichotomized as the presence of any housing stress (problem reported at any level of distress) versus its absence.
+
+### Outcomes and Confounders
+
+Episodic memory was assessed at each wave by trained interviewers using immediate and delayed word recall tasks. For immediate recall, the interviewer read a list of 10 nouns—drawn from four non-overlapping lists rotated across waves and household members—and asked the respondent to recall as many as possible immediately afterward; scores ranged from 0 to 10 [@McCammon2023-oa]. Delayed recall was assessed approximately five minutes later using the same word list and was also scored 0–10. Total word recall (sum of both tasks, range 0–20) served as the episodic memory outcome. Working memory was assessed using a five-step serial subtraction task in which respondents subtracted 7 from 100 consecutively, with each step scored independently and the interviewer not repeating prior responses; scores ranged from 0 to 5 [@McCammon2023-oa]. Both outcomes were standardized to z-scores within each wave to enable comparison across different scales, consistent with prior longitudinal cognitive research [@Andrade2021-gj; @Song2025-zl; @Hahn2015-yw].
+
+Confounders were selected based on the assumed causal structure depicted in Figure 2 [@Bugliari2025-jb]. Time-varying confounders assessed at each wave included age in years at the time of interview, total household income in nominal dollars, and a cumulative count of eight physician-diagnosed chronic conditions (hypertension, diabetes, cancer, chronic lung disease, heart disease, stroke, psychiatric problems, and arthritis; range 0–8) [@Pan2023-cy]. Time-invariant characteristics—including sex, race/ethnicity, and educational attainment—were not included as model covariates because fixed-effects models inherently control for all time-invariant factors through within-person comparisons [@Allison2005-vm; @Quintana2021-ng]. Sex was additionally examined as an effect measure modifier.
+
+### Statistical Analysis
+
+Baseline characteristics were summarized by housing stress status using means (SD) or medians (IQR) for continuous variables and counts (%) for categorical variables. For the primary analysis, we used individual fixed-effects models to estimate the association between ongoing housing stress and each standardized cognitive outcome, expressed as standardized mean differences (β) with 95% confidence intervals (CIs). Model 1 was unadjusted; Model 2 was adjusted for age, household income, and comorbidity burden. Sex-stratified models were used to examine effect measure modification. Cognitive outcome missing values were addressed using HRS-provided imputed cognition scores generated by multivariate regression imputation (IVEware), drawing on demographic, health, and economic variables from the current and prior waves; 'Don't know' responses were treated as incorrect and not imputed [@McCammon2023-oa]. Household income missing values were imputed using the unfolding brackets method [@Bugliari2025-jb]. All remaining missing data were addressed through multiple imputation (m = 20) with results pooled via Rubin's rules. All analyses were conducted in R 4.5.1.
+
+## Results
+
+Table 1 presents baseline characteristics by housing stress status. The final analytic sample included 7,097 participants: 732 (10.3%) reported housing stress and 6,365 (89.7%) did not. The overall sample had a mean age of 67 years (SD 11) and was predominantly female (59%). Compared with those without housing stress, participants with housing stress were younger (mean age 65 vs. 68 years) and more often female (62% vs. 59%). The housing stress group had a higher proportion with less than a high school education (28% vs. 16%), a lower proportion with a college degree or higher (13% vs. 23%), substantially lower median household income ($25,050 [IQR $12,526–$47,050] vs. $42,540 [IQR $22,896–$80,520]), higher rates of current smoking (23% vs. 12%), and greater comorbidity burden (mean 2.26 vs. 1.86). Baseline cognitive performance was lower in the housing stress group across all three cognitive measures: immediate word recall (mean 5.23 vs. 5.57), delayed word recall (4.05 vs. 4.46), and Serial 7's (3.08 vs. 3.70).
+
+\newpage
+
+## Figures
+
+**Figure 1. Participant Flow Diagram**
+
+```{dot}
+//| label: fig-flowchart
+//| fig-cap: "Participant flow diagram showing derivation of the analytic sample from the Health and Retirement Study (HRS). Wave 8 = 2006, Wave 10 = 2010, Wave 12 = 2012."
+//| fig-width: 5.5
+//| fig-height: 5.5
+digraph flowchart {
+    rankdir=TB;
+    graph [splines=ortho, nodesep=0.5, ranksep=0.7];
+    node [shape=box, fontsize=9, style=filled, fillcolor="white", width=2.8, height=0.65];
+    edge [fontsize=8];
+
+    A  [label="HRS Wave 8 Participants (2006)\nN = 18,469", fillcolor="#AED6F1"];
+    B  [label="After excluding memory-related\ndisease at baseline\nN = 17,491", fillcolor="white"];
+    C  [label="After excluding spouses/partners\nand missing exposure data\nN = 7,187", fillcolor="white"];
+    D  [label="Final Analytic Sample\nN = 7,097", fillcolor="#A9DFBF"];
+    D1 [label="Housing Stress\nn = 732 (10.3%)", fillcolor="#A9DFBF", width=2.1];
+    D2 [label="No Housing Stress\nn = 6,365 (89.7%)", fillcolor="#A9DFBF", width=2.1];
+
+    E1 [label="Excluded:\nMemory-related disease\nat baseline (n = 978)", fillcolor="#FADBD8", width=2.3];
+    E2 [label="Excluded:\nSpouses/partners or\nmissing housing stress\n(n = 10,304)", fillcolor="#FADBD8", width=2.3];
+    E3 [label="Excluded:\nMissing cognitive\noutcome data (n = 90)", fillcolor="#FADBD8", width=2.3];
+
+    A -> B;
+    B -> C;
+    C -> D;
+    D -> D1;
+    D -> D2;
+
+    A -> E1 [style=dashed, arrowhead=none];
+    B -> E2 [style=dashed, arrowhead=none];
+    C -> E3 [style=dashed, arrowhead=none];
+
+    { rank=same; A; E1; }
+    { rank=same; B; E2; }
+    { rank=same; C; E3; }
+    { rank=same; D1; D2; }
+}
+```
+
+\bigskip
+
+**Figure 2. Directed Acyclic Graph (DAG) for Confounder Selection**
+
+```{dot}
+//| label: fig-dag
+//| fig-cap: "Directed acyclic graph depicting the assumed causal structure used for confounder selection. Blue = exposure; green = outcomes; yellow (dashed border) = effect measure modifier; grey (dashed border) = unmeasured time-invariant characteristics controlled by the fixed-effects (FE) design. Solid arrows indicate assumed causal pathways; dashed arrows indicate modification or pathways controlled by FE."
+//| fig-width: 6.5
+//| fig-height: 3.8
+digraph dag {
+    rankdir=LR;
+    node [shape=box, fontsize=8, style=filled, fillcolor="white"];
+
+    HS  [label="Ongoing\nHousing Stress\n(Exposure)", fillcolor="#AED6F1"];
+    EM  [label="Episodic\nMemory\n(Outcome)", fillcolor="#A9DFBF"];
+    WM  [label="Working\nMemory\n(Outcome)", fillcolor="#A9DFBF"];
+
+    Age [label="Age\n(time-varying)"];
+    Inc [label="Household\nIncome\n(time-varying)"];
+    Cmb [label="Comorbidity\nBurden\n(time-varying)"];
+
+    Sex [label="Sex\n(Effect Modifier;\nFE-controlled)", style="dashed,filled", fillcolor="#F9E79F"];
+    U   [label="Other Time-invariant\nCharacteristics\n(FE-controlled)", style="dashed,filled", fillcolor="#D7DBDD"];
+
+    HS -> EM;
+    HS -> WM;
+    Age -> HS;
+    Age -> EM;
+    Age -> WM;
+    Inc -> HS;
+    Inc -> EM;
+    Inc -> WM;
+    Cmb -> HS;
+    Cmb -> EM;
+    Cmb -> WM;
+    Sex -> EM [style=dashed];
+    Sex -> WM [style=dashed];
+    U -> HS [style=dashed];
+    U -> EM [style=dashed];
+    U -> WM [style=dashed];
+}
+```
+
+\newpage
+
+```{=latex}
+\newgeometry{top=0.5in, bottom=0.5in, left=0.4in, right=0.4in}
+```
+
+**Table 1.** Baseline Characteristics of HRS Participants by Housing Stress Status at Wave 8 (2006) (*N* = 7,097)
+
+```{r}
+#| label: tbl-table1
+
+dat_long |>
+  filter(wave == 8) |>
+  mutate(
+    housing_stress_bin = factor(
+      housing_stress_bin,
+      levels = c(1, 0),
+      labels = c("Housing Stress", "No Housing Stress")
+    ),
+    sex = factor(
+      sex,
+      levels = c(1, 2),
+      labels = c("Male", "Female")
+    ),
+    education = factor(
+      education,
+      levels = c(1, 2, 3, 4, 5),
+      labels = c(
+        "Less than high school",
+        "GED",
+        "High school diploma",
+        "Some college",
+        "College and above"
+      )
+    ),
+    comorbidity_index = as.numeric(comorbidity_index),
+    ser7 = as.numeric(ser7)
+  ) |>
+  select(
+    housing_stress_bin,
+    age, sex, race_etn, education, income, smoking,
+    comorbidity_index, imrc, dlrc, ser7
+  ) |>
+  tbl_summary(
+    by = housing_stress_bin,
+    statistic = list(
+      all_continuous()  ~ "{mean} ({sd})",
+      all_categorical() ~ "{n} ({p}%)",
+      income            ~ "{median} ({p25}, {p75})"
+    ),
+    type = list(
+      comorbidity_index ~ "continuous",
+      ser7              ~ "continuous"
+    ),
+    label = list(
+      age               ~ "Age, mean (SD), years",
+      sex               ~ "Sex, n (%)",
+      race_etn          ~ "Race/Ethnicity, n (%)",
+      education         ~ "Education, n (%)",
+      income            ~ "Household income, median (IQR), $",
+      smoking           ~ "Current smoker, n (%)",
+      comorbidity_index ~ "Comorbidity index (0–8), mean (SD)",
+      imrc              ~ "Immediate word recall (0–10), mean (SD)",
+      dlrc              ~ "Delayed word recall (0–10), mean (SD)",
+      ser7              ~ "Serial 7's (0–5), mean (SD)"
+    ),
+    missing = "no"
+  ) |>
+  add_overall() |>
+  modify_header(
+    stat_1 ~ "**Housing Stress**\n(n = {n})",
+    stat_2 ~ "**No Housing Stress**\n(n = {n})",
+    stat_0 ~ "**Overall**\n(n = {n})"
+  ) |>
+  bold_labels() -> tbl1
+
+if (knitr::is_latex_output()) {
+  tbl1 |>
+    as_kable_extra(booktabs = TRUE, linesep = "") |>
+    kable_styling(
+      font_size = 9,
+      latex_options = c("hold_position", "scale_down"),
+      full_width = TRUE
+    )
+} else {
+  tbl1 |> as_flex_table()
+}
+```
+
+*Note.* Values are mean (SD) for continuous variables, median (IQR) for household income, and n (%) for categorical variables. Missing data were excluded from this descriptive table; multiple imputation (m = 20) was applied in the main analysis. HRS = Health and Retirement Study; GED = General Educational Development diploma; IQR = interquartile range.
+
+```{=latex}
+\restoregeometry
+```
+
+## References

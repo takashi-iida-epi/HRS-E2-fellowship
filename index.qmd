@@ -64,6 +64,8 @@ bibliography: references.bib
 
 -   Given cognitive declines in mid-file and late life are associated with dementia and Alzheimer’s disease risks, it is important to detect factors of cognitive decline. [@Dhana2025-pq; @Belleville2017-sr]
 
+-   Biologically, chronic stress may impair memory through dysregulation of the hypothalamic-pituitary-adrenal axis and prolonged cortisol exposure. [@Lupien1998-jj]This process has been linked to hippocampal atrophy and poorer hippocampus-dependent memory. [@Sapolsky2000-hm]
+
 -   Cognitive decline is not uniform across domains; episodic memory and working memory are especially relevant to dementia and Alzheimer’s disease.
 
     -   Episodic memory, which assessed using immediate and delayed word recall, shows high diagnostic accuracy for Alzheimer’s disease and is widely studied as an early cognitive marker. \[\@Weissberger2017-vb\]
@@ -81,6 +83,8 @@ bibliography: references.bib
         -   As for speed of cognitive decline, women may have faster declines in global cognition and executive function, compared with men. [@Levine2021-pj]
 
         -   Also, recently occurring stressful life events reported was associated with greater memory decline later life in women but not in men. [@Munro2019-dx]
+
+        -   On the other hand, perceived stress may cause faster cognitive decline in men than women. [@Paolillo2023-he]
 
 ### Pragraph 4
 
@@ -228,9 +232,9 @@ bibliography: references.bib
 
             -   Sensitivity analysis?
 
-                -   check later
+                -   As a sensitivity analysis, we reran the primary models treating housing stress as an ordinal variable (1–4) to assess whether collapsing the "not upsetting" and "very upsetting" response categories affected the magnitude or direction of estimates. Missing Data
 
-        -   **Missing Data**
+            <!-- -->
 
             -   As for missing of cognitive scores, HRS dataset offered imputed cognition data. [@McCammon2023-oa]
             -   Values were imputed to replace missing values, refusals (RF), and any not applicable response.
