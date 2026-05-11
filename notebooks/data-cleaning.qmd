@@ -48,7 +48,7 @@ dat <- read_sas("randhrs1992_2022v1.sas7bdat")
 #| message: false
 
 
-head(dat)
+head(dat) 
 dim(dat)  # n. of observation and n. of variables
 names(dat) # names of variables
 ```
@@ -72,7 +72,6 @@ person id: HHIDPN (HHIDPN: HHold ID + Person Number /Num)
 
 dat %>% group_by("HHIDPN") |> select(contains("HOUSEPRB")) 
 nrow(dat %>% group_by("HHIDPN"))
-nrow
 
 ```
 
@@ -99,11 +98,9 @@ names(dat %>% select(contains("HOUSEPRB")))
 list_id_husplb <- c("HHIDPN", "R8LBHOUSEPRB", "R10LBHOUSEPRB","R11LBHOUSEPRB", "R12LBHOUSEPRB", "R13LBHOUSEPRB", "R14LBHOUSEPRB" )
 # names(dat |> select(list_id_husplb, list_IMRC))
 
+# Spouse lists
+list_id_husplb_spo <- c("HHIDPN", "S8LBHOUSEPRB", "S10LBHOUSEPRB","S11LBHOUSEPRB", "S12LBHOUSEPRB", "S13LBHOUSEPRB", "S14LBHOUSEPRB" )
 ```
-
-
-
-
 
 
 ## Outcome-exploration
@@ -123,14 +120,17 @@ list_id_husplb <- c("HHIDPN", "R8LBHOUSEPRB", "R10LBHOUSEPRB","R11LBHOUSEPRB", "
 # Immediate word recall
 names(dat |> select(contains("IMRC")))
 list_IMRC <- c("R8IMRC","R10IMRC","R11IMRC", "R12IMRC", "R13IMRC")
+list_IMRC_spo <- c("S8IMRC","S10IMRC","S11IMRC", "S12IMRC", "S13IMRC")
 
 # Delayed word recall
 names(dat |> select(contains("DLRC")))
 list_DLRC <- c("R8DLRC","R10DLRC","R11DLRC", "R12DLRC", "R13DLRC")
+list_DLRC_spo <- c("S8DLRC","S10DLRC","S11DLRC", "S12DLRC", "S13DLRC")
 
 # Series 7s
 names(dat |> select(contains("SER7")))
 list_SER7 <- c("R8SER7","R10SER7","R11SER7", "R12SER7", "R13SER7")
+list_SER7_spo <- c("S8SER7","S10SER7","S11SER7", "S12SER7", "S13SER7")
 
 ```
 
@@ -195,14 +195,19 @@ Sex, Education were not included in adjusted model because of the feature of the
 ## dementia ever
 names(dat |> select(contains("MEMRYE")))
 list_exclude <- c("R8MEMRYE")
+list_exclude_spo <- c("S8MEMRYE")
 
-dat |> select(list_exclude) |> filter(R8MEMRYE==1) |> nrow()
+dat |> select(list_exclude) |> filter(R8MEMRYE==1) |> nrow() # 978
+dat |> select(list_exclude_spo) |> filter(S8MEMRYE==1) |> nrow() # 431
+
+
 
 
 # variabels in table 1
 
 ## age at the begging of the interview in years
 names(dat |> select(contains("AGEY"))) # R8AGEY_B
+names(dat |> select(contains("AGEY"))) # S8AGEY_B
 
 ## Gender of respondents
 ## 1: Male
@@ -241,7 +246,7 @@ names(dat |> select(contains("ITOT")))
 ## Smoking
 ## 0: No
 ## 1: Yes
-names(dat |> select(contains("SMOKEN"))) 
+names(dat |> select(contains("SMOKEN"))) # R8SMOKEN, S8SMOKEN
 
 list_confound <- c(
     "R8AGEY_B", "R10AGEY_B",   # age
@@ -256,50 +261,72 @@ list_confound <- c(
     "R12SMOKEN", "R13SMOKEN"
     )
 
+list_confound_spo <- c(
+    "S8AGEY_B", "S10AGEY_B",   # age
+    "S11AGEY_B", "S12AGEY_B", "S13AGEY_B",
+    "RAGENDER", # gender (time-invariant, same variable)
+    "RARACEM",  # race (time-invariant, same variable)
+    "RAHISPAN", # ethnicity (time-invariant, same variable)
+    "RAEDUC", # education (time-invariant, same variable)
+    "H8ITOT",  "H10ITOT", # income (household-level, same variable)
+    "H11ITOT","H12ITOT", "H13ITOT",
+    "S8SMOKEN", "S10SMOKEN", "S11SMOKEN", # smoking
+    "S12SMOKEN", "S13SMOKEN"
+    )
+
 
 ## Doctor diagnosied health problems
 ### High BP
-names(dat |> select(contains("HIBP"))) 
-list_BP_1 <- c("R8HIBPE", "R10HIBPE","R11HIBPE", "R12HIBPE","R13HIBPE")
+names(dat |> select(contains("HIBP")))
+list_BP_1     <- c("R8HIBPE", "R10HIBPE","R11HIBPE", "R12HIBPE","R13HIBPE")
+list_BP_1_spo <- c("S8HIBPE", "S10HIBPE","S11HIBPE", "S12HIBPE","S13HIBPE")
 
 ### Diabetes
-names(dat |> select(contains("DIABE"))) 
-list_db_2 <- c("R8DIABE", "R10DIABE", "R11DIABE", "R12DIABE", "R13DIABE")
+names(dat |> select(contains("DIABE")))
+list_db_2     <- c("R8DIABE", "R10DIABE", "R11DIABE", "R12DIABE", "R13DIABE")
+list_db_2_spo <- c("S8DIABE", "S10DIABE", "S11DIABE", "S12DIABE", "S13DIABE")
 
 ### Cancer
-names(dat |> select(contains("CANCRE"))) 
-list_cancr_3 <- c("R8CANCRE", "R10CANCRE", "R11CANCRE", "R12CANCRE", "R13CANCRE")
+names(dat |> select(contains("CANCRE")))
+list_cancr_3     <- c("R8CANCRE", "R10CANCRE", "R11CANCRE", "R12CANCRE", "R13CANCRE")
+list_cancr_3_spo <- c("S8CANCRE", "S10CANCRE", "S11CANCRE", "S12CANCRE", "S13CANCRE")
 
-### Cancer
-names(dat |> select(contains("LUNGE"))) 
-list_lung_4 <- c("R8LUNGE", "R10LUNGE", "R11LUNGE", "R12LUNGE","R13LUNGE")
+### Lung disease
+names(dat |> select(contains("LUNGE")))
+list_lung_4     <- c("R8LUNGE", "R10LUNGE", "R11LUNGE", "R12LUNGE","R13LUNGE")
+list_lung_4_spo <- c("S8LUNGE", "S10LUNGE", "S11LUNGE", "S12LUNGE","S13LUNGE")
 
 ### Heart problem
-names(dat |> select(contains("HEARTE")))       
-list_heart_5 <- c("R8HEARTE", "R10HEARTE",     
-  "R11HEARTE", "R12HEARTE", "R13HEARTE")         
-                                                 
-### Stroke                                         
+names(dat |> select(contains("HEARTE")))
+list_heart_5     <- c("R8HEARTE", "R10HEARTE", "R11HEARTE", "R12HEARTE", "R13HEARTE")
+list_heart_5_spo <- c("S8HEARTE", "S10HEARTE", "S11HEARTE", "S12HEARTE", "S13HEARTE")
+
+### Stroke
 names(dat |> select(contains("STROKE")))
-list_stroke_6 <- c("R8STROKE", "R10STROKE",
-  "R11STROKE", "R12STROKE", "R13STROKE")
+list_stroke_6     <- c("R8STROKE", "R10STROKE", "R11STROKE", "R12STROKE", "R13STROKE")
+list_stroke_6_spo <- c("S8STROKE", "S10STROKE", "S11STROKE", "S12STROKE", "S13STROKE")
 
 ### Psychiatric Problems
 names(dat |> select(contains("PSYCHE")))
-list_psych_7 <- c("R8PSYCHE", "R10PSYCHE",
-  "R11PSYCHE", "R12PSYCHE", "R13PSYCHE")
+list_psych_7     <- c("R8PSYCHE", "R10PSYCHE", "R11PSYCHE", "R12PSYCHE", "R13PSYCHE")
+list_psych_7_spo <- c("S8PSYCHE", "S10PSYCHE", "S11PSYCHE", "S12PSYCHE", "S13PSYCHE")
 
 ### Arthritis
 names(dat |> select(contains("ARTHRE")))
-list_arthr_8 <- c("R8ARTHRE", "R10ARTHRE",
-  "R11ARTHRE", "R12ARTHRE", "R13ARTHRE")
+list_arthr_8     <- c("R8ARTHRE", "R10ARTHRE", "R11ARTHRE", "R12ARTHRE", "R13ARTHRE")
+list_arthr_8_spo <- c("S8ARTHRE", "S10ARTHRE", "S11ARTHRE", "S12ARTHRE", "S13ARTHRE")
 
 
 ## list Comorbidity index
- list_Comorbidity_index <- c(list_BP_1,         
-  list_db_2, list_cancr_3, list_lung_4,          
-  list_heart_5, list_stroke_6, list_psych_7,     
-  list_arthr_8)                                  
+list_Comorbidity_index <- c(list_BP_1,
+  list_db_2, list_cancr_3, list_lung_4,
+  list_heart_5, list_stroke_6, list_psych_7,
+  list_arthr_8)
+
+list_Comorbidity_index_spo <- c(list_BP_1_spo,
+  list_db_2_spo, list_cancr_3_spo, list_lung_4_spo,
+  list_heart_5_spo, list_stroke_6_spo, list_psych_7_spo,
+  list_arthr_8_spo)                                  
                    
 
 # try
@@ -314,11 +341,32 @@ list_arthr_8 <- c("R8ARTHRE", "R10ARTHRE",
 ## data merge
 
 ```{r}
-dat_an <- dat |> 
-    select(list_id_husplb, list_IMRC, list_DLRC, list_SER7, list_confound, list_Comorbidity_index, list_exclude)
+# data for respondents
+# identifiers for household
+# H8HHID: household identifiers(with info about spliting or not in the wave)
+names(dat |> select(contains("HHID")))
+list_ident <- c("H8HHID", "H9HHID", "H10HHID", "H11HHID", "H12HHID", "H13HHID")
+
+dat_an <- dat |>
+    select(list_id_husplb, list_IMRC, list_DLRC, list_SER7, list_confound, list_Comorbidity_index, list_exclude,
+    list_ident) # # household identifier
 head(dat_an)
 names(dat_an)
 dim(dat_an)
+
+# data for spouses
+# identifiers for household
+names(dat |> select(contains("HHID")))
+list_ident_spo <- c("H8HHID", "H9HHID", "H10HHID", "H11HHID", "H12HHID", "H13HHID")
+
+dat_an_spo <- dat |>
+    select(list_id_husplb_spo, list_IMRC_spo, list_DLRC_spo, list_SER7_spo, list_confound_spo, list_Comorbidity_index_spo, list_exclude_spo,
+    list_ident_spo) # household identifier
+
+head(dat_an_spo)
+names(dat_an_spo)
+dim(dat_an_spo)
+
 ```
 
 
@@ -407,53 +455,192 @@ dim(dat_an)
 ```
 
 
+```{r}
+# for spouses
+# Total recall, Z-scored total recall, Z-scored Series 7s
+dat_an_spo <- dat_an_spo |>
+      mutate(
+          # Total recall = IMRC + DLRC
+          S8TR  = S8IMRC  + S8DLRC,
+          S10TR = S10IMRC + S10DLRC,
+          S11TR = S11IMRC + S11DLRC,
+          S12TR = S12IMRC + S12DLRC,
+          S13TR = S13IMRC + S13DLRC,
+        # Z-scored total recall (within wave)
+          S8TR_Z  = (S8TR  - mean(S8TR,  na.rm = TRUE)) / sd(S8TR,  na.rm = TRUE),
+          S10TR_Z = (S10TR - mean(S10TR, na.rm = TRUE)) / sd(S10TR, na.rm = TRUE),
+          S11TR_Z = (S11TR - mean(S11TR, na.rm = TRUE)) / sd(S11TR, na.rm = TRUE),
+          S12TR_Z = (S12TR - mean(S12TR, na.rm = TRUE)) / sd(S12TR, na.rm = TRUE),
+          S13TR_Z = (S13TR - mean(S13TR, na.rm = TRUE)) / sd(S13TR, na.rm = TRUE),
+        # Z-scored SER7 (within wave)
+          S8SER7_Z  = (S8SER7  - mean(S8SER7,  na.rm = TRUE)) / sd(S8SER7,  na.rm = TRUE),
+          S10SER7_Z = (S10SER7 - mean(S10SER7, na.rm = TRUE)) / sd(S10SER7, na.rm = TRUE),
+          S11SER7_Z = (S11SER7 - mean(S11SER7, na.rm = TRUE)) / sd(S11SER7, na.rm = TRUE),
+          S12SER7_Z = (S12SER7 - mean(S12SER7, na.rm = TRUE)) / sd(S12SER7, na.rm = TRUE),
+          S13SER7_Z = (S13SER7 - mean(S13SER7, na.rm = TRUE)) / sd(S13SER7, na.rm = TRUE)
+      )
+
+
+# Race and Ethnicity
+dat_an_spo <- dat_an_spo |>
+      mutate(
+          Race_etn = case_when(
+              RAHISPAN == 1 ~ "Hispanic",
+              RARACEM == 1  ~ "Non-Hispanic White",
+              RARACEM == 2  ~ "Non-Hispanic Black",
+              RARACEM == 3  ~ "Non-Hispanic Other"
+          ) |>
+        factor(levels = c("Non-Hispanic White",
+                            "Non-Hispanic Black",
+                            "Hispanic",
+                            "Non-Hispanic Other"))
+      )
+
+# Comorbidity index
+dat_an_spo <- dat_an_spo |>
+      mutate(
+          comob_ind_w8  = S8HIBPE  + S8DIABE  + S8CANCRE  + S8LUNGE  + S8HEARTE  + S8STROKE  + S8PSYCHE  + S8ARTHRE,
+          comob_ind_w10 = S10HIBPE + S10DIABE + S10CANCRE + S10LUNGE + S10HEARTE + S10STROKE + S10PSYCHE + S10ARTHRE,
+          comob_ind_w11 = S11HIBPE + S11DIABE + S11CANCRE + S11LUNGE +
+            S11HEARTE + S11STROKE + S11PSYCHE + S11ARTHRE,
+          comob_ind_w12 = S12HIBPE + S12DIABE + S12CANCRE + S12LUNGE +
+            S12HEARTE + S12STROKE + S12PSYCHE + S12ARTHRE,
+          comob_ind_w13 = S13HIBPE + S13DIABE + S13CANCRE + S13LUNGE +
+            S13HEARTE + S13STROKE + S13PSYCHE + S13ARTHRE
+      )
+
+head(dat_an_spo)
+names(dat_an_spo)
+dim(dat_an_spo)
+```
+
+
+## Combine
+
+```{r}
+
+# ----------------------------------------------------
+# 1. give role (respondent or spouse)
+# ------------------------------------------------------------
+dat_resp <- dat_an_ex |>
+  mutate(role = "respondent")
+
+dat_spo <- dat_an_ex_spo |>
+  rename_with(~ str_replace(.x, "^S(\\d)", "R\\1")) |>
+  mutate(
+    role = "spouse",
+    R14LBHOUSEPRB = NA_real_ # no 
+  )
+
+# ------------------------------------------------------------
+# 2. Stack and check
+# ------------------------------------------------------------
+dat_wide_combined <- bind_rows(dat_resp, dat_spo) |>
+  arrange(HHIDPN, role) |>  
+  distinct(HHIDPN, .keep_all = TRUE)
+
+cat("Stacked rows:", nrow(dat_wide_combined), "\n")                    # 7,744
+cat("Unique HHIDPN:", n_distinct(dat_wide_combined$HHIDPN), "\n")      # 7,744
+n_distinct(dat_wide_combined$H8HHID) # 648
+table(dat_wide_combined$role) # respondent: 7097, spouse: 647
+              
+stopifnot(nrow(dat_wide_combined) == n_distinct(dat_wide_combined$HHIDPN))
+
+
+# NA check
+# all respondents and spouse have valid household ID
+dat_wide_combined |>
+  group_by(role) |>
+  summarise(
+    n = n(),
+    n_hhid_na    = sum(is.na(H8HHID)),
+    n_hhid_valid = sum(!is.na(H8HHID))
+  )
+
+dat_wide_combined |> head()
+
+# check HHIDPN overlap
+sum(duplicated(dat_wide_combined$HHIDPN)) # 0
+
+```
+
+
 ## Exclusion
 
 - Participants without exposure and outcomes data at baseline (Wave 8)  
 - Participants who reported a doctor-diagnosed memory-related disease at baseline (Wave 8)  
 
+
 ```{r}
+# ------------------------------------------------------------
+# Step 0: all participants
+# ------------------------------------------------------------
 
-# check excluded number
-nrow(dat_an)  # 45234 (Before exclusion)     
-# (26,765 excluded)          
-nrow(dat_an |> filter(!is.na(R8MEMRYE))) # 18469 remain
-# (978 excluded)
-nrow(dat_an |> filter(R8MEMRYE == 0)) # 17491 remain 
-# (10,304 excluded)
-nrow(dat_an |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB))) # 7187 remain
-# (90 excluded)
-nrow(dat_an |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
-                    !is.na(R8IMRC))) # remain 7097
-nrow(dat_an |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
-                    !is.na(R8IMRC), !is.na(R8DLRC))) # remain 7097
-nrow(dat_an |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
-                    !is.na(R8IMRC), !is.na(R8DLRC),!is.na(R8SER7) ))
-                    # remain 7097
+n_unique <- function(ids_r, ids_s) length(union(ids_r, ids_s))
+all_r <- dat_an$HHIDPN
+all_s <- dat_an_spo$HHIDPN
+n_unique(all_r, all_s) # All unique participants: 45234
+
+# ------------------------------------------------------------
+# Step 1: Wave 8 participants
+# ------------------------------------------------------------
+r_w8 <- dat_an     |> filter(!is.na(R8MEMRYE)) |> pull(HHIDPN)
+s_w8 <- dat_an_spo |> filter(!is.na(S8MEMRYE)) |> pull(HHIDPN)
+n_unique(r_w8, s_w8) # Wave 8 unique: 18469
+n_unique(all_r, all_s) - n_unique(r_w8, s_w8) # Excluded:26765
+
+# ------------------------------------------------------------
+# Step 2: memory disease exclude
+# ------------------------------------------------------------
+r_mem <- dat_an     |> filter(R8MEMRYE == 0) |> pull(HHIDPN)
+s_mem <- dat_an_spo |> filter(S8MEMRYE == 0) |> pull(HHIDPN)
+n_unique(r_mem, s_mem) # No memory disease unique: 17890
+n_unique(r_w8, s_w8) - n_unique(r_mem, s_mem) # Excluded: 579
+
+# ------------------------------------------------------------
+# Step 3: housing stress data exist
+# ------------------------------------------------------------
+r_hse <- dat_an     |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB)) |> pull(HHIDPN)
+s_hse <- dat_an_spo |> filter(S8MEMRYE == 0, !is.na(S8LBHOUSEPRB)) |> pull(HHIDPN)
+n_unique(r_hse, s_hse) # With housing stress unique: 7765
+n_unique(r_mem, s_mem) - n_unique(r_hse, s_hse) # Excluded: 10125
+
+# ------------------------------------------------------------
+# Step 4: cognitive data exist（final analytic sample）
+# ------------------------------------------------------------
+r_fin <- dat_an     |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
+                               !is.na(R8IMRC), !is.na(R8DLRC), !is.na(R8SER7)) |> pull(HHIDPN)
+s_fin <- dat_an_spo |> filter(S8MEMRYE == 0, !is.na(S8LBHOUSEPRB),
+                               !is.na(S8IMRC), !is.na(S8DLRC), !is.na(S8SER7)) |> pull(HHIDPN)
+
+# final analytic sample 
+n_unique(r_fin, s_fin) # 7744
+
+# Excluded
+n_unique(r_hse, s_hse) - n_unique(r_fin, s_fin) # 21
 
 
-dat_an_ex <- dat_an |> 
-    filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
-            !is.na(R8IMRC), !is.na(R8DLRC),!is.na(R8SER7))
+# ------------------------------------------------------------
+# check roles
+# ------------------------------------------------------------
 
-dim(dat_an_ex)
+# Respondent only
+length(setdiff(r_fin, s_fin)) # 2939
 
+# Spouse only
+length(setdiff(s_fin, r_fin)) # 647
 
+# Both
+length(intersect(r_fin, s_fin)) # 4158
 
-# check num of w8 parricipants
-## 18469
-## No data in R8MEMRYE -> No data other variables
-sum(!is.na(dat_an$R8MEMRYE)) # 18469 : w8 participants
-sum(is.na(dat_an$R8MEMRYE)) # 26765: did not participante in w8
-sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8LBHOUSEPRB)) # 0
-sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8IMRC)) # 0
-sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8DLRC)) # 0
-sum(is.na(dat_an$R8MEMRYE) & !is.na(dat_an$R8SER7)) # 0
+# ------------------------------------------------------------
+# check House problems follow-up for subgroup
+# ------------------------------------------------------------
 
-
-# check House problems follow-up for subgroup 
-dat_an |> 
-  filter(!is.na(R8LBHOUSEPRB)) |> 
+#  be careful about being overlap below
+# respondents
+dat_an |>
+  filter(!is.na(R8LBHOUSEPRB)) |>
   summarise(
     w8_housing = sum(!is.na(R8LBHOUSEPRB)), # 7422
     w10_housing = sum(!is.na(R10LBHOUSEPRB)), # 5319
@@ -461,11 +648,21 @@ dat_an |>
     w12_housing = sum(!is.na(R12LBHOUSEPRB)), # 4450
     w13_housing = sum(!is.na(R13LBHOUSEPRB)), # 3
     w14_housing = sum(!is.na(R14LBHOUSEPRB)) # 2800
+  )
+
+# spouses
+dat_an_spo |>
+  filter(!is.na(S8LBHOUSEPRB)) |>
+  summarise(
+    w8_housing  = sum(!is.na(S8LBHOUSEPRB)), # 5038
+    w10_housing = sum(!is.na(S10LBHOUSEPRB)), # 3409
+    w11_housing = sum(!is.na(S11LBHOUSEPRB)), # 0
+    w12_housing = sum(!is.na(S12LBHOUSEPRB)), # 2632
+    w13_housing = sum(!is.na(S13LBHOUSEPRB)), # 1
+    w14_housing = sum(!is.na(S14LBHOUSEPRB)) # 1582
   ) 
 
-
 ```
-
 
 
 ## Change into long format
@@ -473,48 +670,50 @@ dat_an |>
 Use wave 8, 10, 12
 
 ```{r}
-
-# Wave 8, 10, 12
 waves <- c(8, 10, 12)
 
-# long format
-dat_long <- map_dfr(waves, function(w) {
-  dat_an_ex |> 
+dat_long_combined <- map_dfr(waves, function(w) {
+  dat_wide_combined |> 
     transmute(
       HHIDPN,
-      wave = w,
+      HHID  = get(paste0("H", w, "HHID")),  # HHID by wave
+      role,                                  
+      wave  = w,
 
       # Time-invariant
-      sex       = RAGENDER,
-      race      = RARACEM,
-      hispanic  = RAHISPAN,
-      education = RAEDUC,
-      race_etn  = Race_etn,
+      sex            = RAGENDER,
+      race           = RARACEM,
+      hispanic       = RAHISPAN,
+      education      = RAEDUC,
+      race_etn       = Race_etn,
 
       # Exposure
       housing_stress = get(paste0("R", w, "LBHOUSEPRB")),
 
       # Outcomes
-      imrc        = get(paste0("R", w, "IMRC")),
-      dlrc        = get(paste0("R", w, "DLRC")),
-      ser7        = get(paste0("R", w, "SER7")),
-      total_recall = get(paste0("R", w, "TR")),
+      imrc           = get(paste0("R", w, "IMRC")),
+      dlrc           = get(paste0("R", w, "DLRC")),
+      ser7           = get(paste0("R", w, "SER7")),
+      total_recall   = get(paste0("R", w, "TR")),
       total_recall_z = get(paste0("R", w, "TR_Z")),
-      ser7_z      = get(paste0("R", w, "SER7_Z")),
+      ser7_z         = get(paste0("R", w, "SER7_Z")),
 
       # Confounders
-      age         = get(paste0("R", w, "AGEY_B")),
-      income      = get(paste0("H", w, "ITOT")),
-      smoking     = get(paste0("R", w, "SMOKEN")),
+      age               = get(paste0("R", w, "AGEY_B")),
+      income            = get(paste0("H", w, "ITOT")),
+      smoking           = get(paste0("R", w, "SMOKEN")),
       comorbidity_index = get(paste0("comob_ind_w", w))
     )
 }) |> 
   arrange(HHIDPN, wave)
 
-# 
-dim(dat_long)  # 21291    18
-head(dat_long, 21)
+# check
+dim(dat_long_combined)  # 23232    20
+n_distinct(dat_long_combined$HHIDPN) # unique individuals: 7744
+n_distinct(dat_long_combined$HHID) # Unique households: 5,206
+
 ```
+
 
 # chekc num of housing stress between waves
 
@@ -522,7 +721,7 @@ head(dat_long, 21)
 # check num of housing stress between waves
 ## -> too small num of partcipants changing from 1->2~4
 ## it might be difficult to chekc fixed effect in categorical housing stress
-dat_long %>%
+dat_long_combined %>%
   select(HHIDPN, wave, housing_stress) %>%
   pivot_wider(names_from = wave, values_from = housing_stress, 
               names_prefix = "w") %>%
@@ -530,24 +729,62 @@ dat_long %>%
   arrange(desc(n)) 
 ```
 
-```{r}
 
-# exposure -> dichotomized
+## Factor, Binary, Numeric
+
+```{r}
+# housing stress -> dichotomized
 # 0 = No housing problem
 # 1 = Yes, any housing problem (2+3+4)
-dat_long <- dat_long |> 
+dat_long_combined <- dat_long_combined |> 
   mutate(
     housing_stress_bin = ifelse(housing_stress == 1, 0, 1)
     )
 
+# wave -> factor
+dat_long_combined <- dat_long_combined |> 
+  mutate(wave = factor(wave, levels = c(8, 10, 12)))
+
+ # sex -> factor
+dat_long_combined <- dat_long_combined |> 
+  mutate(
+    sex = factor(
+      sex,
+      levels = c(1, 2),
+      labels = c("Male", "Female")
+    ))
+
+# education -> factor
+dat_long_combined <- dat_long_combined |> 
+  mutate(
+    education = factor(
+      education,
+      levels = c(1,2,3,4,5), 
+      labels = c("Less than high school", "General Educational Diploma", "High school diplomas", "Some college", "College and above")
+    ))
+
+# comorbidity_index, ser7 -> numeric
+dat_long_combined <- dat_long_combined |> 
+  mutate(
+    comorbidity_index = as.numeric(comorbidity_index),
+    ser7 = as.numeric(ser7)
+    )
 
 # number of participants experienced Housing stress more than 1 wave
-dat_long |> 
+dat_long_combined |> 
   group_by(HHIDPN) |> 
   summarise(ever_stress = max(housing_stress_bin, na.rm = TRUE)) |> 
   summarise(n_ever_stress = sum(ever_stress == 1))
 
-table(dat_long$housing_stress_bin, useNA = "always")
+# check raw vs binary housing stress
+# correclty converted
+dat_long_combined |> 
+  count(housing_stress, housing_stress_bin)
+
+
+# check
+head(dat_long_combined, 20) |> view()
+names(dat_long_combined)
 ```
 
 
@@ -556,6 +793,6 @@ table(dat_long$housing_stress_bin, useNA = "always")
 ```{r}
 getwd()
 
-saveRDS(dat_an_ex, "dat_an_ex.rds")
-saveRDS(dat_long,  "dat_long.rds")
+saveRDS(dat_wide_combined, "dat_wide_combined.rds")
+saveRDS(dat_long_combined,  "dat_long_combined.rds")
 ```

@@ -1,0 +1,295 @@
+---
+title: "Analysis"
+author: "Takashi Iida"
+date: today
+format: html
+html-table-processing: none
+---
+## Overview
+
+This document creates tables and figures for the manuscript.
+During E2 class, we excluded spouses, but decided to include spouse because of the feedback.
+This is draft I used while E2, excluding spouses. 
+
+## Setup
+
+```{r}
+#| label: setup
+#| message: false
+
+
+library(tidyverse)
+library(haven)
+library(gtsummary)
+```
+
+## Load clean data  
+
+```{r}
+# data import
+# install.packages("haven")
+
+
+getwd()
+
+base_directory <- "/Users/iidatakashi/Documents/Git/HRS-E2-fellowship/data"
+
+setwd(base_directory)
+
+dat_long <- readRDS("dat_long.rds")
+head(dat_long)
+
+names(dat_long)
+```
+
+
+## Table 1
+
+```{r}
+#| label: tbl-table1
+#| tbl-cap: "Table 1. Baseline characteristics at Wave 8 (2006), prior to multiple imputation. 
+#|   Values are mean (SD) for continuous variables and n (%) for categorical variables.
+#|   Missing data: income (XX%), smoking (XX%), comorbidity index (XX%)."
+dat_long |>
+  filter(wave == 8) |> 
+  mutate(
+    housing_stress_bin = factor(
+      housing_stress_bin,
+      levels = c(1, 0),
+      labels = c("Housing Stress", "No Housing Stress")
+    ),
+    # sex -> factor
+    sex = factor(
+      sex,
+      levels = c(1, 2),
+      labels = c("Male", "Female")
+    ),
+    education = factor(
+      education,
+      levels = c(1,2,3,4,5), 
+      labels = c("Less than high school", "General Educational Diploma", "High school diplomas", "Some college", "College and above")
+    ),
+    # comorbidity_index, ser7 -> numeric
+    comorbidity_index = as.numeric(comorbidity_index),
+    ser7 = as.numeric(ser7)
+  ) |>
+  select(
+    housing_stress_bin,
+    age, sex, race_etn, education, income, smoking,
+    comorbidity_index,
+    imrc, dlrc, ser7
+  ) |>
+  tbl_summary(
+    by = housing_stress_bin,
+    statistic = list(
+      all_continuous()  ~ "{mean} ({sd})",
+      all_categorical() ~ "{n} ({p}%)",
+      income            ~ "{median} ({p25}, {p75})" 
+    ),
+    type = list(
+      comorbidity_index ~ "continuous",
+      ser7              ~ "continuous"
+    ),
+    label = list(
+      age               ~ "Age, mean(SD)(years)",
+      sex               ~ "Sex, n(%)",
+      race_etn          ~"Race and ethnicity, n(%)",
+      education         ~ "Education, n(%)",
+      income            ~ "Household income, median(IQR)($)",
+      smoking           ~ "Current smoker, n(%)",
+      comorbidity_index ~ "Comorbidity index (0–8), mean(SD)",
+      imrc              ~ "Immediate word recall (0–10), mean(SD)",
+      dlrc              ~ "Delayed word recall (0–10), mean(SD)",
+      ser7              ~ "Serial 7's (0–5), mean(SD)"
+    ),
+    missing = "no"
+  ) |>
+  add_overall() |>
+  modify_header(
+    stat_1 ~ "**Housing Stress**  \n(n = {n})",
+    stat_2 ~ "**No Housing Stress**  \n(n = {n})",
+    stat_0 ~ "**Overall**  \n(n = {n})"
+  ) |>
+  bold_labels()
+```
+
+
+
+
+
+
+## Multiple imputation
+
+
+```{r}
+# install.packages("mice")
+library(mice)
+
+# check num of NAs in each variable
+colSums(is.na(dat_long |> 
+    select(housing_stress_bin, total_recall_z, ser7_z,
+            age, income, smoking, comorbidity_index)))
+
+            library(mice)
+
+# dataset for multiple imutation
+dat_mi <- dat_long |> 
+  select(
+    HHIDPN, wave,
+    
+    # variabels for analysis
+    housing_stress_bin,
+    total_recall_z, ser7_z,
+    age, income, smoking, comorbidity_index,
+    
+    # Time-invariant
+    sex, race_etn, education,
+    
+    # Auxiliary variables（attritionと相関しやすい）
+    # imrc, dlrc,        # components of total_recall_z ->remove(collinear)
+    # ser7,              # raw score ->remove(collinear)
+    # total_recall,    # raw total recall ->remove(collinear)
+    # housing_stress,    # raw housing stress ->remove(collinear)
+  )
+
+# remove HHIDPN and wave for imputation
+ini <- mice(dat_mi, maxit = 0)
+meth <- ini$method
+meth["HHIDPN"] <- ""
+meth["wave"]   <- ""
+
+# Warning
+# ini$loggedEvents
+# table(dat_mi$race_etn, useNA = "always")
+
+# remove HHIDPN from predictormatrix
+ini  <- mice(dat_mi, maxit = 0)
+meth <- ini$method
+meth["HHIDPN"] <- ""
+meth["wave"]   <- ""
+
+# edit predictormatrix
+pred <- ini$predictorMatrix
+pred[, "HHIDPN"] <- 0  # remove HHIDPNfrom predictor
+
+imp <- mice(
+  dat_mi, 
+  method          = meth,
+  predictorMatrix = pred,
+  m               = 20, 
+  seed            = 123, 
+  print           = FALSE
+)
+
+# check
+summary(imp)
+plot(imp)
+```
+
+
+## Modeling
+
+
+```{r}
+install.packages("fixest")
+library(fixest)
+
+# imputed datasetsを取り出してリストに格納
+imp_list <- lapply(1:20, function(i) complete(imp, i))
+
+# 各imputed datasetにFEモデルを適用
+models_tr <- lapply(imp_list, function(d) {
+  feols(total_recall_z ~ housing_stress_bin + age + income + 
+                         smoking + comorbidity_index + wave 
+        | HHIDPN,
+        cluster = ~HHIDPN,
+        data = d)
+})
+
+models_ser7 <- lapply(imp_list, function(d) {
+  feols(ser7_z ~ housing_stress_bin + age + income + 
+                 smoking + comorbidity_index + wave 
+        | HHIDPN,
+        cluster = ~HHIDPN,
+        data = d)
+})
+
+# Rubin's rulesでpooling
+pool_tr   <- pool(models_tr)
+pool_ser7 <- pool(models_ser7)
+
+summary(pool_tr, conf.int = TRUE)
+summary(pool_ser7)
+```
+
+
+## Plot
+
+### Forest plot
+
+```{r}
+ggplot(res_plot, aes(x = estimate, y = outcome, color = outcome)) +
+  geom_point(size = 4) +
+  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), 
+                 height = 0.15, size = 1) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  # p値をラベルとして追加
+  geom_text(aes(label = paste0("p = ", round(p.value, 3)),
+                x = `97.5 %` + 0.005),
+            hjust = 0, size = 3.5, color = "gray30") +
+  scale_color_manual(values = c("Episodic Memory" = "#E07B6A",
+                                "Working Memory"  = "#4AABB8")) +
+  labs(
+    title = "Effect of Ongoing Housing Stress\non Cognitive Function",
+    subtitle = "Fixed Effects Model\nadjusted for age, income, smoking, comorbidity",
+    x = "Coefficient (95% CI)",
+    y = NULL
+  ) +
+  expand_limits(x = 0.02) +  # p値表示のスペース確保
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title    = element_text(size = 13, face = "bold"),
+        plot.subtitle = element_text(size = 10, color = "gray50"),
+        axis.text.y   = element_text(size = 12))
+```
+
+
+
+## DAG
+
+Description: This DAG illustrates the hypothesized relationship between housing stress (exposure) and cognitive decline (outcome). Demographic characteristics, health problems, social determinants of health (SDoH), and smoking status are included as covariates. Demographic characteristics are age, sex, and race and ethnicity. SDoH are education and household incomes. Health problems include hypertension, diabetes or high blood sugar, cancer or malignant tumor (excluding skin cancer), chronic lung disease (excluding asthma), heart disease (including heart attack, coronary heart disease, angina, congestive heart failure, or other heart problems), stroke or transient ischemic attack, emotional, nervous, or psychiatric problems, and arthritis or rheumatism.
+
+
+Abbreviations: DAG = Directed Acyclic Graph, SDoH = Social Determinants of Health
+
+
+```{dot}
+digraph DAG {
+  layout=neato;
+  node [shape=box, fontsize=12];
+  
+  Demographic     [label="Demographic",         pos="0,2!"];
+  Health_Problems [label="Health Problems",     pos="2,3!"];
+  SDoH            [label="SDoH",                pos="2,1!"];
+  Health_Behavior [label="Smoking Status",     pos="2,0!"];
+  Housing_Stress  [label="Housing Stress (X)",  pos="4,1.5!"];
+  Cognitive_Decline [label="Cognitive Decline (Y)", pos="6,1.5!"];
+  
+  Demographic -> Health_Problems;
+  Demographic -> SDoH;
+  Demographic -> Housing_Stress;
+  Demographic -> Cognitive_Decline;
+  
+  Health_Problems -> SDoH;
+  Health_Problems -> Housing_Stress;
+  Health_Problems -> Cognitive_Decline;
+  
+  SDoH -> Housing_Stress;
+  SDoH -> Cognitive_Decline;
+  
+  Health_Behavior -> Housing_Stress;
+  Health_Behavior -> Cognitive_Decline;
+  
+  Housing_Stress -> Cognitive_Decline;
+}
+```

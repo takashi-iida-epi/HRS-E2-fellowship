@@ -29,7 +29,7 @@ base_directory <- "/Users/iidatakashi/Documents/Git/HRS-E2-fellowship/data"
 
 setwd(base_directory)
 
-dat_long_combined <- readRDS("dat_long_combined.rds")
+dat_long <- readRDS("dat_long.rds")
 ```
 
 
@@ -40,11 +40,29 @@ Table 1. Characteristics of Participants in the Health and Retirement Study by H
 #| label: tbl-table1
 #| echo: false
 
-dat_long_combined |>
+dat_long |>
   filter(wave == 8) |> 
   mutate(
-    education = fct_rev(education)
-  ) |> 
+    housing_stress_bin = factor(
+      housing_stress_bin,
+      levels = c(1, 0),
+      labels = c("Housing Stress", "No Housing Stress")
+    ),
+    # sex -> factor
+    sex = factor(
+      sex,
+      levels = c(1, 2),
+      labels = c("Male", "Female")
+    ),
+    education = factor(
+      education,
+      levels = c(1,2,3,4,5), 
+      labels = c("Less than high school", "General Educational Diploma", "High school diplomas", "Some college", "College and above")
+    ),
+    # comorbidity_index, ser7 -> numeric
+    comorbidity_index = as.numeric(comorbidity_index),
+    ser7 = as.numeric(ser7)
+  ) |>
   select(
     housing_stress_bin,
     age, sex, race_etn, education, income, smoking,
@@ -78,9 +96,10 @@ dat_long_combined |>
   ) |>
   add_overall() |>
   modify_header(
-    stat_1 ~ "**No Housing Stress**  \n(n = {n})",  # 0
-    stat_2 ~ "**Housing Stress**  \n(n = {n})",     # 1
-    stat_0 ~ "**Overall**  \n(n = {n})") |>
+    stat_1 ~ "**Housing Stress**  \n(n = {n})",
+    stat_2 ~ "**No Housing Stress**  \n(n = {n})",
+    stat_0 ~ "**Overall**  \n(n = {n})"
+  ) |>
   bold_labels() |> 
   as_flex_table() |> 
   set_table_properties(layout = "autofit", width = 1) 

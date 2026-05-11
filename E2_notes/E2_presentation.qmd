@@ -1,0 +1,125 @@
+---
+title: "Ongoing Housing Stress and Cognitive Decline"
+subtitle: "Evidence from the Health and Retirement Study"
+author: "Takashi Iida"
+date: today
+format: pptx
+---
+
+## 1 in 3 Older Americans Face Housing Insecurity
+
+- WHO: housing = intermediary determinant of health
+- Affordability · Suitability · Security — when unmet → harm
+- >700,000 experienced homelessness in 2024
+- Older adults face particular vulnerability
+
+::: {.notes}
+Housing is not just a shelter issue — it's a health issue. The WHO classifies it as an intermediary determinant of health. In the US, housing insecurity is widespread and growing among older adults.
+:::
+
+---
+
+## Housing Stress May Accelerate Memory Decline
+
+**Prior evidence links housing to cognition, but gaps remain**
+
+- Housing stress → chronic psychological stress → adverse health
+- Foreclosure linked to faster cognitive decline in older adults
+- Two domains especially relevant to Alzheimer's disease:
+  - **Episodic memory** — early AD marker (word recall)
+  - **Working memory** — central executive function (serial 7's)
+- Women may experience stronger stress-related memory decline
+
+::: {.notes}
+Emerging evidence suggests housing stress specifically affects memory. Two domains are particularly important for Alzheimer's research: episodic memory (word recall) and working memory (serial 7's). Sex differences in stress-related cognitive decline are also documented.
+:::
+
+---
+
+## Research Questions
+
+**1.** Does **ongoing housing stress** accelerate decline in episodic and working memory among adults 50+?
+
+**2.** Does **sex** modify this association?
+
+*Hypothesis: Housing stress accelerates cognitive decline, with stronger effects in women*
+
+::: {.notes}
+These two questions guide our study. We focus on ongoing, chronic housing stress (lasting ≥12 months) and examine both episodic and working memory separately.
+:::
+
+---
+
+## Methods
+
+**Health and Retirement Study (HRS)**
+
+- Nationally representative cohort of U.S. adults aged 50+
+- Baseline: Wave 8 (2006) · Follow-up: Waves 10 & 12 (2008–2012)
+- **n = 7,097** (excluded memory-disease diagnoses at baseline)
+
+**Exposure** — Ongoing housing stress: self-reported problem lasting ≥12 months
+
+**Outcomes** — Episodic memory z-score (word recall) · Working memory z-score (serial 7's)
+
+**Analysis** — Individual fixed-effects models (adjusted for age, income, comorbidity)
+
+::: {.notes}
+We used wave 8 as baseline because that's when HRS began collecting housing stress data. Fixed-effects models exploit within-person change over time, controlling for all time-invariant characteristics.
+:::
+
+---
+
+## Table 1 — Baseline Characteristics (Wave 8, 2006)
+
+| | Housing Stress | No Housing Stress |
+|:---|:---:|:---:|
+| **n** | **732** | **6,365** |
+| Age, mean (SD) | 65 (10) | 68 (11) |
+| Female, % | 62% | 59% |
+| Less than HS, % | 28% | 16% |
+| College+, % | 13% | 23% |
+| Median income | $25,050 | $42,540 |
+| Current smoker, % | 23% | 12% |
+| Comorbidity index (0–8) | 2.26 | 1.86 |
+| Immediate recall (0–10) | 5.23 | 5.57 |
+| Delayed recall (0–10) | 4.05 | 4.46 |
+| Serial 7's (0–5) | 3.08 | 3.70 |
+
+::: {.notes}
+These are baseline characteristics before any imputation. The two groups differ on many dimensions — this motivates the fixed-effects design.
+:::
+
+---
+
+## Housing Stress Group: Systematically Disadvantaged
+
+**Socioeconomic** — lower education, ~40% lower income, more smoking
+
+**Health** — higher comorbidity burden (2.26 vs 1.86)
+
+**Cognition** — lower scores across all 3 tests at baseline
+
+→ Fixed-effects design controls for time-invariant confounders
+
+::: {.notes}
+The housing stress group is younger but has a worse health and socioeconomic profile. Crucially, they also start with lower cognitive scores. This baseline difference is exactly why we use fixed-effects — we compare each person to themselves over time.
+:::
+
+---
+
+## Next Steps
+
+**Main analysis (in progress)**
+
+- Fixed-effects model results: episodic memory & working memory
+- Sex-stratified analysis: do effects differ in women vs. men?
+
+**Planned outputs**
+
+- Forest plot of effect estimates
+- Full manuscript submission
+
+::: {.notes}
+The fixed-effects results and sex-stratified analysis are the core of what's coming. We expect to see whether within-person changes in housing stress predict within-person changes in cognition.
+:::
