@@ -34,10 +34,10 @@ base_directory <- "/Users/iidatakashi/Documents/Git/HRS-E2-fellowship/data"
 
 setwd(base_directory)
 
-dat_long <- readRDS("dat_long.rds")
-head(dat_long)
-
+dat_long <- readRDS("dat_long_combined.rds")
+head(dat_long, 30) |> view()
 names(dat_long)
+
 ```
 
 
@@ -118,17 +118,75 @@ dat_long |>
 
 ## Multiple imputation
 
+check NA
 
 ```{r}
 # install.packages("mice")
 library(mice)
 
-# check num of NAs in each variable
-colSums(is.na(dat_long |> 
-    select(housing_stress_bin, total_recall_z, ser7_z,
-            age, income, smoking, comorbidity_index)))
+# check NA per wave
+dat_long |>
+  group_by(wave) |>
+  summarise(across(everything(), ~sum(is.na(.)))) |>
+  print(width = Inf)
 
-            library(mice)
+
+# Compare NA rates between alive vs dead vs censored
+dat_long |>
+  group_by(status) |>
+  summarise(
+    n = n(),
+    across(
+      everything(),
+      list(
+        n_miss   = ~ sum(is.na(.)),
+        pct_miss = ~ round(mean(is.na(.)) * 100, 1)
+      )
+    )
+  ) |>
+  pivot_longer(
+    -c(status, n),
+    names_to  = c("variable", ".value"),
+    names_sep = "_(?=n_miss|pct_miss)"
+  ) |>
+  filter(n_miss > 0) |>
+  arrange(variable, status) |> 
+  view()
+
+```
+
+restrict only alive data
+- not restricting alive samples, but restrict samples until dead
+  - eg 8: alive, 10: alive, 12:dead -> use 8 and 10
+
+```{r}
+# NA to impute = alive rows only
+# censored rows have ~100% NA → not imputable, handled by IPCW
+
+dat_alive <- dat_long |>
+  filter(status != "dead")
+
+# Household ID NA
+# Check how many censored rows have NA HHID
+dat_long |>
+  filter(status == "censored") |>
+  summarise(
+    n_total    = n(),
+    n_hhid_na  = sum(is.na(HHID)),
+    pct_hhid_na = round(mean(is.na(HHID)) * 100, 1)
+  )
+
+# Check if HHIDPN is available for censored rows with NA HHID
+dat_long |>
+  filter(status == "censored", is.na(HHID)) |>
+  summarise(
+    n_hhidpn_na = sum(is.na(HHIDPN)),
+    n_hhidpn_ok = sum(!is.na(HHIDPN))
+  )
+```
+
+
+```{r}
 
 # dataset for multiple imutation
 dat_mi <- dat_long |> 
@@ -251,6 +309,13 @@ ggplot(res_plot, aes(x = estimate, y = outcome, color = outcome)) +
         axis.text.y   = element_text(size = 12))
 ```
 
+
+## Main analysis
+
+Mixed-effects 3level + IPCW
+- Household clustering
+- longitudinal
+- attrition
 
 
 ## DAG

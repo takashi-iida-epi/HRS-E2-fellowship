@@ -15,7 +15,6 @@ This document creates tables and figures for the manuscript.
 #| label: setup
 #| message: false
 
-
 library(tidyverse)
 library(haven)
 ```
@@ -89,6 +88,19 @@ nrow(dat %>% group_by("HHIDPN"))
 
 # numbers of waves containing HOUSEPRB
 dim(dat %>% select(contains("HOUSEPRB"))) #  16
+
+# number of participants for HOUSEPRB at wave 8-15
+## wave 9 did not have HOUSEPRB
+dat |>
+  summarise(
+    w8_housing = sum(!is.na(R8LBHOUSEPRB)), # 7422
+    w10_housing = sum(!is.na(R10LBHOUSEPRB)), # 5319
+    w11_housing = sum(!is.na(R11LBHOUSEPRB)), # 1 (no f/u subgrp )
+    w12_housing = sum(!is.na(R12LBHOUSEPRB)), # 4450
+    w13_housing = sum(!is.na(R13LBHOUSEPRB)), # 3
+    w14_housing = sum(!is.na(R14LBHOUSEPRB)), # 2800
+    w15_housing = sum(!is.na(R15LBHOUSEPRB)) # 2800
+  )
 
 # waves: S&R 8,10,11,12,13,14,15,16
 names(dat %>% select(contains("HOUSEPRB"))) 
@@ -166,6 +178,10 @@ variabels in table 1
     - 3. High-school graduate
     - 4. some college
     - 5. college and above
+    - 1. Less than high school
+    - 2. high school and general educational diplomas
+    - 3. some College
+    - 4. ollege and above
 - income
     - total household income
 - smoking
@@ -232,6 +248,11 @@ names(dat |> select(contains("RAHISPAN"))) # RAHISPAN
 ## 3. High-school graduate
 ## 4. some college
 ## 5. college and above
+# change into
+## 1. Less than high school
+## 2. high school and general educational diplomas
+## 3. some College
+## 4. ollege and above
 names(dat |> select(contains("RAEDUC"))) # RAEDUC
 
 
@@ -370,7 +391,7 @@ dim(dat_an_spo)
 ```
 
 
-## Make conbined variables
+## Make combined variables
 
 Outcome
 - Z scored total recall
@@ -519,6 +540,30 @@ dim(dat_an_spo)
 
 ```{r}
 
+
+# make dat_an_ex ----------------------------------------
+dat_an_ex <- dat_an |>
+  filter(
+    R8MEMRYE == 0,          # no memory-related disease at baseline
+    !is.na(R8LBHOUSEPRB),   # baseline exposure exist
+    !is.na(R8IMRC),         # baseline outcome (episodic) exist
+    !is.na(R8DLRC),
+    !is.na(R8SER7)          # baseline outcome (working) exist
+  )
+# 45,234 → 17,491 → 7,187 → 7,097
+dim(dat_an_ex)  # 7097 109
+
+dat_an_spo_ex <- dat_an_spo |>
+  filter(
+    S8MEMRYE == 0,          # no memory-related disease at baseline
+    !is.na(S8LBHOUSEPRB),   # baseline exposure exist
+    !is.na(S8IMRC),         # baseline outcome (episodic) exist
+    !is.na(S8DLRC),
+    !is.na(S8SER7)          # baseline outcome (working) exist
+  )
+dim(dat_an_spo_ex)  # 4805  109 (but overlap exists)
+
+
 # ----------------------------------------------------
 # 1. give role (respondent or spouse)
 # ------------------------------------------------------------
@@ -561,6 +606,9 @@ dat_wide_combined |> head()
 
 # check HHIDPN overlap
 sum(duplicated(dat_wide_combined$HHIDPN)) # 0
+
+# check HHIDPN overlap
+sum(duplicated(dat_wide_combined$H8HHID)) # 2725
 
 ```
 
@@ -732,6 +780,8 @@ dat_long_combined %>%
 
 ## Factor, Binary, Numeric
 
+- Change education category
+
 ```{r}
 # housing stress -> dichotomized
 # 0 = No housing problem
@@ -754,14 +804,25 @@ dat_long_combined <- dat_long_combined |>
       labels = c("Male", "Female")
     ))
 
-# education -> factor
-dat_long_combined <- dat_long_combined |> 
+# education -> change category + factor 
+dat_long_combined <- dat_long_combined |>
   mutate(
     education = factor(
-      education,
-      levels = c(1,2,3,4,5), 
-      labels = c("Less than high school", "General Educational Diploma", "High school diplomas", "Some college", "College and above")
-    ))
+      case_when(
+        education == 1        ~ 1,  # Lt high school
+        education %in% c(2, 3) ~ 2,  # GED + high-school graduate を統合
+        education == 4        ~ 3,  # some college
+        education == 5        ~ 4   # college and above
+      ),
+      levels = c(1, 2, 3, 4),
+      labels = c(
+        "Less than high school",
+        "High school and general educational diplomas",
+        "Some college",
+        "College and above"
+      )
+    )
+  )
 
 # comorbidity_index, ser7 -> numeric
 dat_long_combined <- dat_long_combined |> 
@@ -785,6 +846,155 @@ dat_long_combined |>
 # check
 head(dat_long_combined, 20) |> view()
 names(dat_long_combined)
+```
+
+
+## Death records
+
+- Need to define death and censoring
+
+- using RADDATE(date of death) and IWEND(interview end date), categolized into:
+  - IWEND exist: alive at the wave
+  - RADDATE exist & RADDATE < IWEND at the wave : death at the wave
+  
+
+```{r}
+
+# ── step 1: exact death date and interview date from dat─────────
+person_level <- dat |>
+  select(HHIDPN, RADDATE,
+         R8IWEND,  R10IWEND,  R12IWEND, # respondent
+         S8IWEND,  S10IWEND,  S12IWEND) |> # spouse
+  distinct() |>
+  filter(HHIDPN %in% dat_long_combined$HHIDPN)
+
+
+# ── step 2: combine cols regardless of roles─────────────────
+role_info <- dat_long_combined |>
+  distinct(HHIDPN, role)
+
+person_level <- person_level |>
+  left_join(role_info, by = "HHIDPN") |>
+  mutate(
+    IWEND_w8  = if_else(role == "respondent", R8IWEND,  S8IWEND),
+    IWEND_w10 = if_else(role == "respondent", R10IWEND, S10IWEND),
+    IWEND_w12 = if_else(role == "respondent", R12IWEND, S12IWEND)
+  ) |>
+  mutate(
+    across(c(RADDATE, IWEND_w8, IWEND_w10, IWEND_w12),
+           ~ as.Date(., origin = "1960-01-01"))
+  ) |>
+  mutate(
+    has_death_record = !is.na(RADDATE)
+  )
+
+
+# ── Step 3: define wave base date──────────────────────────
+
+# check num of NA for interview dates at waves
+person_level |>
+  summarise(
+    na_IWEND_w8  = sum(is.na(IWEND_w8)),
+    na_IWEND_w10 = sum(is.na(IWEND_w10)),
+    na_IWEND_w12 = sum(is.na(IWEND_w12))
+  )
+
+# NA in interview dates -> median
+wave_ref <- person_level |>
+  mutate(
+    ref_w8  = coalesce(IWEND_w8,  as.Date("2006-09-01")),
+    ref_w10 = coalesce(IWEND_w10, as.Date("2010-09-01")),
+    ref_w12 = coalesce(IWEND_w12, as.Date("2014-09-01"))
+  )
+
+
+# ── step 4:  status(alive / dead / dropout) at each wave────────
+status <- wave_ref |>
+  mutate(
+    # Wave 8
+    status_w8 = case_when(
+      has_death_record & RADDATE < ref_w8 ~ "dead",
+      !is.na(IWEND_w8)                    ~ "alive",
+      TRUE                                ~ "censored"
+    ),
+    # Wave 10
+    status_w10 = case_when(
+      status_w8 == "dead"                  ~ "dead",
+      has_death_record & RADDATE < ref_w10 ~ "dead",
+      !is.na(IWEND_w10)                    ~ "alive",
+      TRUE                                 ~ "censored"
+    ),
+    # Wave 12
+    status_w12 = case_when(
+      status_w10 == "dead"                 ~ "dead",
+      has_death_record & RADDATE < ref_w12 ~ "dead",
+      !is.na(IWEND_w12)                    ~ "alive",
+      TRUE                                 ~ "censored"
+    )
+  ) |>
+  select(HHIDPN, has_death_record,
+         status_w8, status_w10, status_w12)
+
+
+# ── Step 5: check────────────────────
+status |> count(status_w8) # alive      7744
+status |> count(status_w10) # dead: 776, censored: 457
+status |> count(status_w12) # dead: 1684, censored: 669
+
+# check: no one dead at wave 8: 0
+status |> filter(status_w8 == "dead") #0
+
+# check: alive -> alive（dead -> alive=0）
+status |>
+  filter(status_w10 == "alive" & status_w8 == "dead") #0
+
+
+# -- Step 6: merge into dat_long_combined----------------
+dat_long_combined <- dat_long_combined |>
+  left_join(
+    status |>
+      pivot_longer(
+        cols      = starts_with("status_w"),
+        names_to  = "wave_label",
+        values_to = "status"
+      ) |>
+      mutate(wave = factor(str_extract(wave_label, "\\d+"),
+                           levels = c("8", "10", "12"))) |> 
+      select(-wave_label),
+    by = c("HHIDPN", "wave")
+  )
+
+# check status count
+dat_long_combined |>
+  group_by(wave, status) |>
+  count()
+
+# check status NA
+dat_long_combined |>
+  summarise(na_status = sum(is.na(status))) # 0
+
+dat_long_combined |> dim() # 23232    21
+dat_long_combined$HHIDPN |> n_distinct() # 7744
+
+
+# step 7: merge into wide format--------------------------------
+
+dat_wide_combined <- dat_wide_combined |>
+  left_join(
+    status |> select(HHIDPN, status_w8, status_w10, status_w12),
+    by = "HHIDPN"
+  )
+
+# check
+nrow(dat_wide_combined)  # 7744
+
+dat_wide_combined |>
+  summarise(
+    na_status_w8  = sum(is.na(status_w8)), # 0
+    na_status_w10 = sum(is.na(status_w10)), # 0
+    na_status_w12 = sum(is.na(status_w12)) # 0
+  )  
+
 ```
 
 
