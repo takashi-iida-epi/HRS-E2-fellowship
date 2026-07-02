@@ -37,6 +37,7 @@ setwd(base_directory)
 dat_long <- readRDS("dat_long_combined.rds")
 head(dat_long, 30) |> view()
 names(dat_long)
+dat_long$HHIDPN |> n_distinct() # 7744
 
 ```
 

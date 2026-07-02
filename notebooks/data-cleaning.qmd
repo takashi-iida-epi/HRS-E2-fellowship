@@ -48,7 +48,7 @@ dat <- read_sas("randhrs1992_2022v1.sas7bdat")
 
 
 head(dat) 
-dim(dat)  # n. of observation and n. of variables
+dim(dat)  # 45234 19880: n. of observation and n. of variables
 names(dat) # names of variables
 ```
 
@@ -131,18 +131,23 @@ list_id_husplb_spo <- c("HHIDPN", "S8LBHOUSEPRB", "S10LBHOUSEPRB","S11LBHOUSEPRB
 
 # Immediate word recall
 names(dat |> select(contains("IMRC")))
-list_IMRC <- c("R8IMRC","R10IMRC","R11IMRC", "R12IMRC", "R13IMRC")
-list_IMRC_spo <- c("S8IMRC","S10IMRC","S11IMRC", "S12IMRC", "S13IMRC")
+list_IMRC <- c("R8IMRC","R10IMRC","R11IMRC", "R12IMRC", "R13IMRC", "R14IMRC")
+list_IMRC_spo <- c("S8IMRC","S10IMRC","S11IMRC", "S12IMRC", "S13IMRC", "S14IMRC")
 
 # Delayed word recall
 names(dat |> select(contains("DLRC")))
-list_DLRC <- c("R8DLRC","R10DLRC","R11DLRC", "R12DLRC", "R13DLRC")
-list_DLRC_spo <- c("S8DLRC","S10DLRC","S11DLRC", "S12DLRC", "S13DLRC")
+list_DLRC <- c("R8DLRC","R10DLRC","R11DLRC", "R12DLRC", "R13DLRC", "R14DLRC")
+list_DLRC_spo <- c("S8DLRC","S10DLRC","S11DLRC", "S12DLRC", "S13DLRC", "S14DLRC")
 
 # Series 7s
 names(dat |> select(contains("SER7")))
-list_SER7 <- c("R8SER7","R10SER7","R11SER7", "R12SER7", "R13SER7")
-list_SER7_spo <- c("S8SER7","S10SER7","S11SER7", "S12SER7", "S13SER7")
+list_SER7 <- c("R8SER7","R10SER7","R11SER7", "R12SER7", "R13SER7", "R14SER7")
+list_SER7_spo <- c("S8SER7","S10SER7","S11SER7", "S12SER7", "S13SER7", "S14SER7")
+
+# Cognitive score 27 (for sensitivity analysis)
+names(dat |> select(contains("COG27")))
+list_cog27 <- c("R8COG27","R10COG27","R11COG27", "R12COG27", "R13COG27", "R14COG27")
+list_cog27_spo <- c("S8COG27","S10COG27","S11COG27", "S12COG27", "S13COG27", "S14COG27")
 
 ```
 
@@ -203,7 +208,6 @@ variabels in table 1
     - memo
         - sleep disorder is measured from w13, so not included
 
-Sex, Education were not included in adjusted model because of the feature of the model
 
 ```{r}
 # exclusion variabels
@@ -215,7 +219,6 @@ list_exclude_spo <- c("S8MEMRYE")
 
 dat |> select(list_exclude) |> filter(R8MEMRYE==1) |> nrow() # 978
 dat |> select(list_exclude_spo) |> filter(S8MEMRYE==1) |> nrow() # 431
-
 
 
 
@@ -359,650 +362,494 @@ list_Comorbidity_index_spo <- c(list_BP_1_spo,
 
 
 
-## data merge
-
-```{r}
-# data for respondents
-# identifiers for household
-# H8HHID: household identifiers(with info about spliting or not in the wave)
-names(dat |> select(contains("HHID")))
-list_ident <- c("H8HHID", "H9HHID", "H10HHID", "H11HHID", "H12HHID", "H13HHID")
-
-dat_an <- dat |>
-    select(list_id_husplb, list_IMRC, list_DLRC, list_SER7, list_confound, list_Comorbidity_index, list_exclude,
-    list_ident) # # household identifier
-head(dat_an)
-names(dat_an)
-dim(dat_an)
-
-# data for spouses
-# identifiers for household
-names(dat |> select(contains("HHID")))
-list_ident_spo <- c("H8HHID", "H9HHID", "H10HHID", "H11HHID", "H12HHID", "H13HHID")
-
-dat_an_spo <- dat |>
-    select(list_id_husplb_spo, list_IMRC_spo, list_DLRC_spo, list_SER7_spo, list_confound_spo, list_Comorbidity_index_spo, list_exclude_spo,
-    list_ident_spo) # household identifier
-
-head(dat_an_spo)
-names(dat_an_spo)
-dim(dat_an_spo)
-
-```
-
-
-## Make combined variables
-
-Outcome
-- Z scored total recall
-    - total recall = immediate word recall + delayed word recall(range from 0-20)
-    - z scored total recall
-    - mean and sd are used in the wave
-- Z scored Series 7s
-    - mean and sd are used in the wave
-
-Confounders
-- race and ethnicity 
-    - Non-Hispanic White
-    - Non-Hispanic Black
-    - Hispanic
-    - Non-Hispanic Other
-- Comorbidity index
-    - range from 0-8
-    - total counts of Yes(1) among Doctor diagnosied health problems
+## Create person-wave long data 
 
 ```{r}
 
-# Total recall, Z-scored total recall, Z-scored Series 7s
-dat_an <- dat_an |>                    
-      mutate(                            
-          # Total recall = IMRC + DLRC   
-          R8TR  = R8IMRC  + R8DLRC,     
-          R10TR = R10IMRC + R10DLRC,
-          R11TR = R11IMRC + R11DLRC,     
-          R12TR = R12IMRC + R12DLRC,     
-          R13TR = R13IMRC + R13DLRC,     
-        # Z-scored total recall (within wave)                                 
-          R8TR_Z=(R8TR  - mean(R8TR, na.rm = TRUE)) / sd(R8TR,na.rm =TRUE),
-          R10TR_Z=(R10TR - mean(R10TR, na.rm = TRUE)) / sd(R10TR, na.rm = TRUE),
-          R11TR_Z=(R11TR - mean(R11TR, na.rm = TRUE)) / sd(R11TR, na.rm = TRUE),
-          R12TR_Z=(R12TR - mean(R12TR, na.rm = TRUE)) / sd(R12TR, na.rm = TRUE),
-          R13TR_Z=(R13TR - mean(R13TR, na.rm = TRUE)) / sd(R13TR, na.rm = TRUE),
-        # Z-scored SER7 (within wave)
-          R8SER7_Z = (R8SER7 - mean(R8SER7, na.rm = TRUE)) / sd(R8SER7,
-            na.rm = TRUE),
-          R10SER7_Z = (R10SER7 - mean(R10SER7, na.rm = TRUE)) / sd(R10SER7, 
-            na.rm = TRUE),
-          R11SER7_Z = (R11SER7 - mean(R11SER7, na.rm = TRUE)) / sd(R11SER7, 
-            na.rm = TRUE),
-          R12SER7_Z = (R12SER7 - mean(R12SER7, na.rm = TRUE)) / sd(R12SER7,
-            na.rm = TRUE),
-          R13SER7_Z = (R13SER7 - mean(R13SER7, na.rm = TRUE)) / sd(R13SER7, 
-            na.rm = TRUE)
-      )
+waves_all <- c(8, 10, 12, 14)
+treatment_waves <- c(8, 10, 12)
 
-
-# Race and Ethnicity
- dat_an <- dat_an |>                 
-      mutate(                       
-          Race_etn = case_when(       
-              RAHISPAN == 1 ~ "Hispanic",                         
-              RARACEM == 1  ~ "Non-Hispanic White",               
-              RARACEM == 2  ~ "Non-Hispanic Black",               
-              RARACEM == 3  ~ "Non-Hispanic Other"
-          ) |> 
-        factor(levels = c("Non-Hispanic White", 
-                            "Non-Hispanic Black",
-                            "Hispanic",
-                            "Non-Hispanic Other")) 
-      )
-
-# Comorbidity index
- dat_an <- dat_an |>                 
-      mutate(                         
-          comob_ind_w8  = R8HIBPE  + R8DIABE + R8CANCRE  + R8LUNGE + R8HEARTE  + R8STROKE  + R8PSYCHE  + R8ARTHRE,
-          comob_ind_w10 = R10HIBPE + R10DIABE + R10CANCRE + R10LUNGE + R10HEARTE + R10STROKE + R10PSYCHE + R10ARTHRE,                          
-          comob_ind_w11 = R11HIBPE + R11DIABE + R11CANCRE + R11LUNGE +
-            R11HEARTE + R11STROKE + R11PSYCHE + R11ARTHRE,
-          comob_ind_w12 = R12HIBPE + R12DIABE + R12CANCRE + R12LUNGE +
-            R12HEARTE + R12STROKE + R12PSYCHE + R12ARTHRE,
-          comob_ind_w13 = R13HIBPE + R13DIABE + R13CANCRE + R13LUNGE +
-            R13HEARTE + R13STROKE + R13PSYCHE + R13ARTHRE
-      )
-
-head(dat_an)
-names(dat_an)
-dim(dat_an)
-```
-
-
-```{r}
-# for spouses
-# Total recall, Z-scored total recall, Z-scored Series 7s
-dat_an_spo <- dat_an_spo |>
-      mutate(
-          # Total recall = IMRC + DLRC
-          S8TR  = S8IMRC  + S8DLRC,
-          S10TR = S10IMRC + S10DLRC,
-          S11TR = S11IMRC + S11DLRC,
-          S12TR = S12IMRC + S12DLRC,
-          S13TR = S13IMRC + S13DLRC,
-        # Z-scored total recall (within wave)
-          S8TR_Z  = (S8TR  - mean(S8TR,  na.rm = TRUE)) / sd(S8TR,  na.rm = TRUE),
-          S10TR_Z = (S10TR - mean(S10TR, na.rm = TRUE)) / sd(S10TR, na.rm = TRUE),
-          S11TR_Z = (S11TR - mean(S11TR, na.rm = TRUE)) / sd(S11TR, na.rm = TRUE),
-          S12TR_Z = (S12TR - mean(S12TR, na.rm = TRUE)) / sd(S12TR, na.rm = TRUE),
-          S13TR_Z = (S13TR - mean(S13TR, na.rm = TRUE)) / sd(S13TR, na.rm = TRUE),
-        # Z-scored SER7 (within wave)
-          S8SER7_Z  = (S8SER7  - mean(S8SER7,  na.rm = TRUE)) / sd(S8SER7,  na.rm = TRUE),
-          S10SER7_Z = (S10SER7 - mean(S10SER7, na.rm = TRUE)) / sd(S10SER7, na.rm = TRUE),
-          S11SER7_Z = (S11SER7 - mean(S11SER7, na.rm = TRUE)) / sd(S11SER7, na.rm = TRUE),
-          S12SER7_Z = (S12SER7 - mean(S12SER7, na.rm = TRUE)) / sd(S12SER7, na.rm = TRUE),
-          S13SER7_Z = (S13SER7 - mean(S13SER7, na.rm = TRUE)) / sd(S13SER7, na.rm = TRUE)
-      )
-
-
-# Race and Ethnicity
-dat_an_spo <- dat_an_spo |>
-      mutate(
-          Race_etn = case_when(
-              RAHISPAN == 1 ~ "Hispanic",
-              RARACEM == 1  ~ "Non-Hispanic White",
-              RARACEM == 2  ~ "Non-Hispanic Black",
-              RARACEM == 3  ~ "Non-Hispanic Other"
-          ) |>
-        factor(levels = c("Non-Hispanic White",
-                            "Non-Hispanic Black",
-                            "Hispanic",
-                            "Non-Hispanic Other"))
-      )
-
-# Comorbidity index
-dat_an_spo <- dat_an_spo |>
-      mutate(
-          comob_ind_w8  = S8HIBPE  + S8DIABE  + S8CANCRE  + S8LUNGE  + S8HEARTE  + S8STROKE  + S8PSYCHE  + S8ARTHRE,
-          comob_ind_w10 = S10HIBPE + S10DIABE + S10CANCRE + S10LUNGE + S10HEARTE + S10STROKE + S10PSYCHE + S10ARTHRE,
-          comob_ind_w11 = S11HIBPE + S11DIABE + S11CANCRE + S11LUNGE +
-            S11HEARTE + S11STROKE + S11PSYCHE + S11ARTHRE,
-          comob_ind_w12 = S12HIBPE + S12DIABE + S12CANCRE + S12LUNGE +
-            S12HEARTE + S12STROKE + S12PSYCHE + S12ARTHRE,
-          comob_ind_w13 = S13HIBPE + S13DIABE + S13CANCRE + S13LUNGE +
-            S13HEARTE + S13STROKE + S13PSYCHE + S13ARTHRE
-      )
-
-head(dat_an_spo)
-names(dat_an_spo)
-dim(dat_an_spo)
-```
-
-
-## Combine
-
-```{r}
-
-
-# make dat_an_ex ----------------------------------------
-dat_an_ex <- dat_an |>
-  filter(
-    R8MEMRYE == 0,          # no memory-related disease at baseline
-    !is.na(R8LBHOUSEPRB),   # baseline exposure exist
-    !is.na(R8IMRC),         # baseline outcome (episodic) exist
-    !is.na(R8DLRC),
-    !is.na(R8SER7)          # baseline outcome (working) exist
+# Function to classify interview and vital status
+classify_iwstat <- function(x) {
+  dplyr::case_when(
+    x == 1         ~ "alive_interviewed",
+    x == 4         ~ "alive_nonrespondent",
+    x %in% c(5, 6) ~ "dead",
+    x == 7         ~ "dropped",
+    x == 0         ~ "inapplicable",
+    x == 9         ~ "unknown_vital_status",
+    TRUE           ~ NA_character_
   )
-# 45,234 → 17,491 → 7,187 → 7,097
-dim(dat_an_ex)  # 7097 109
+}
 
-dat_an_spo_ex <- dat_an_spo |>
-  filter(
-    S8MEMRYE == 0,          # no memory-related disease at baseline
-    !is.na(S8LBHOUSEPRB),   # baseline exposure exist
-    !is.na(S8IMRC),         # baseline outcome (episodic) exist
-    !is.na(S8DLRC),
-    !is.na(S8SER7)          # baseline outcome (working) exist
-  )
-dim(dat_an_spo_ex)  # 4805  109 (but overlap exists)
+person_long_all <- purrr::map_dfr(waves_all, function(w) {
 
-
-# ----------------------------------------------------
-# 1. give role (respondent or spouse)
-# ------------------------------------------------------------
-dat_resp <- dat_an_ex |>
-  mutate(role = "respondent")
-
-dat_spo <- dat_an_ex_spo |>
-  rename_with(~ str_replace(.x, "^S(\\d)", "R\\1")) |>
-  mutate(
-    role = "spouse",
-    R14LBHOUSEPRB = NA_real_ # no 
-  )
-
-# ------------------------------------------------------------
-# 2. Stack and check
-# ------------------------------------------------------------
-dat_wide_combined <- bind_rows(dat_resp, dat_spo) |>
-  arrange(HHIDPN, role) |>  
-  distinct(HHIDPN, .keep_all = TRUE)
-
-cat("Stacked rows:", nrow(dat_wide_combined), "\n")                    # 7,744
-cat("Unique HHIDPN:", n_distinct(dat_wide_combined$HHIDPN), "\n")      # 7,744
-n_distinct(dat_wide_combined$H8HHID) # 648
-table(dat_wide_combined$role) # respondent: 7097, spouse: 647
-              
-stopifnot(nrow(dat_wide_combined) == n_distinct(dat_wide_combined$HHIDPN))
-
-
-# NA check
-# all respondents and spouse have valid household ID
-dat_wide_combined |>
-  group_by(role) |>
-  summarise(
-    n = n(),
-    n_hhid_na    = sum(is.na(H8HHID)),
-    n_hhid_valid = sum(!is.na(H8HHID))
-  )
-
-dat_wide_combined |> head()
-
-# check HHIDPN overlap
-sum(duplicated(dat_wide_combined$HHIDPN)) # 0
-
-# check HHIDPN overlap
-sum(duplicated(dat_wide_combined$H8HHID)) # 2725
-
-```
-
-
-## Exclusion
-
-- Participants without exposure and outcomes data at baseline (Wave 8)  
-- Participants who reported a doctor-diagnosed memory-related disease at baseline (Wave 8)  
-
-
-```{r}
-# ------------------------------------------------------------
-# Step 0: all participants
-# ------------------------------------------------------------
-
-n_unique <- function(ids_r, ids_s) length(union(ids_r, ids_s))
-all_r <- dat_an$HHIDPN
-all_s <- dat_an_spo$HHIDPN
-n_unique(all_r, all_s) # All unique participants: 45234
-
-# ------------------------------------------------------------
-# Step 1: Wave 8 participants
-# ------------------------------------------------------------
-r_w8 <- dat_an     |> filter(!is.na(R8MEMRYE)) |> pull(HHIDPN)
-s_w8 <- dat_an_spo |> filter(!is.na(S8MEMRYE)) |> pull(HHIDPN)
-n_unique(r_w8, s_w8) # Wave 8 unique: 18469
-n_unique(all_r, all_s) - n_unique(r_w8, s_w8) # Excluded:26765
-
-# ------------------------------------------------------------
-# Step 2: memory disease exclude
-# ------------------------------------------------------------
-r_mem <- dat_an     |> filter(R8MEMRYE == 0) |> pull(HHIDPN)
-s_mem <- dat_an_spo |> filter(S8MEMRYE == 0) |> pull(HHIDPN)
-n_unique(r_mem, s_mem) # No memory disease unique: 17890
-n_unique(r_w8, s_w8) - n_unique(r_mem, s_mem) # Excluded: 579
-
-# ------------------------------------------------------------
-# Step 3: housing stress data exist
-# ------------------------------------------------------------
-r_hse <- dat_an     |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB)) |> pull(HHIDPN)
-s_hse <- dat_an_spo |> filter(S8MEMRYE == 0, !is.na(S8LBHOUSEPRB)) |> pull(HHIDPN)
-n_unique(r_hse, s_hse) # With housing stress unique: 7765
-n_unique(r_mem, s_mem) - n_unique(r_hse, s_hse) # Excluded: 10125
-
-# ------------------------------------------------------------
-# Step 4: cognitive data exist（final analytic sample）
-# ------------------------------------------------------------
-r_fin <- dat_an     |> filter(R8MEMRYE == 0, !is.na(R8LBHOUSEPRB),
-                               !is.na(R8IMRC), !is.na(R8DLRC), !is.na(R8SER7)) |> pull(HHIDPN)
-s_fin <- dat_an_spo |> filter(S8MEMRYE == 0, !is.na(S8LBHOUSEPRB),
-                               !is.na(S8IMRC), !is.na(S8DLRC), !is.na(S8SER7)) |> pull(HHIDPN)
-
-# final analytic sample 
-n_unique(r_fin, s_fin) # 7744
-
-# Excluded
-n_unique(r_hse, s_hse) - n_unique(r_fin, s_fin) # 21
-
-
-# ------------------------------------------------------------
-# check roles
-# ------------------------------------------------------------
-
-# Respondent only
-length(setdiff(r_fin, s_fin)) # 2939
-
-# Spouse only
-length(setdiff(s_fin, r_fin)) # 647
-
-# Both
-length(intersect(r_fin, s_fin)) # 4158
-
-# ------------------------------------------------------------
-# check House problems follow-up for subgroup
-# ------------------------------------------------------------
-
-#  be careful about being overlap below
-# respondents
-dat_an |>
-  filter(!is.na(R8LBHOUSEPRB)) |>
-  summarise(
-    w8_housing = sum(!is.na(R8LBHOUSEPRB)), # 7422
-    w10_housing = sum(!is.na(R10LBHOUSEPRB)), # 5319
-    w11_housing = sum(!is.na(R11LBHOUSEPRB)), # 1 (no f/u subgrp )
-    w12_housing = sum(!is.na(R12LBHOUSEPRB)), # 4450
-    w13_housing = sum(!is.na(R13LBHOUSEPRB)), # 3
-    w14_housing = sum(!is.na(R14LBHOUSEPRB)) # 2800
-  )
-
-# spouses
-dat_an_spo |>
-  filter(!is.na(S8LBHOUSEPRB)) |>
-  summarise(
-    w8_housing  = sum(!is.na(S8LBHOUSEPRB)), # 5038
-    w10_housing = sum(!is.na(S10LBHOUSEPRB)), # 3409
-    w11_housing = sum(!is.na(S11LBHOUSEPRB)), # 0
-    w12_housing = sum(!is.na(S12LBHOUSEPRB)), # 2632
-    w13_housing = sum(!is.na(S13LBHOUSEPRB)), # 1
-    w14_housing = sum(!is.na(S14LBHOUSEPRB)) # 1582
-  ) 
-
-```
-
-
-## Change into long format
-
-Use wave 8, 10, 12
-
-```{r}
-waves <- c(8, 10, 12)
-
-dat_long_combined <- map_dfr(waves, function(w) {
-  dat_wide_combined |> 
+  dat |>
     transmute(
+      # Person ID
       HHIDPN,
-      HHID  = get(paste0("H", w, "HHID")),  # HHID by wave
-      role,                                  
-      wave  = w,
 
-      # Time-invariant
-      sex            = RAGENDER,
-      race           = RARACEM,
-      hispanic       = RAHISPAN,
-      education      = RAEDUC,
-      race_etn       = Race_etn,
+      # Fixed baseline household ID for clustering
+      cluster_id = H8HHID,
+
+      # Household ID at each wave
+      hhid_wave = .data[[paste0("H", w, "HHID")]],
+
+      wave = w,
+
+      # Baseline eligibility variable
+      baseline_memory_disease = R8MEMRYE,
+
+      # Time-invariant variables
+      sex       = RAGENDER,
+      race      = RARACEM,
+      hispanic  = RAHISPAN,
+      education = RAEDUC,
 
       # Exposure
-      housing_stress = get(paste0("R", w, "LBHOUSEPRB")),
+      housing_stress =
+        .data[[paste0("R", w, "LBHOUSEPRB")]],
+
 
       # Outcomes
-      imrc           = get(paste0("R", w, "IMRC")),
-      dlrc           = get(paste0("R", w, "DLRC")),
-      ser7           = get(paste0("R", w, "SER7")),
-      total_recall   = get(paste0("R", w, "TR")),
-      total_recall_z = get(paste0("R", w, "TR_Z")),
-      ser7_z         = get(paste0("R", w, "SER7_Z")),
+      imrc = if (w < 14) {
+        .data[[paste0("R", w, "IMRC")]]
+      } else {
+        coalesce(
+          .data[[paste0("R", w, "IMRCP")]],
+          .data[[paste0("R", w, "IMRCW")]]
+        )
+      },
 
-      # Confounders
-      age               = get(paste0("R", w, "AGEY_B")),
-      income            = get(paste0("H", w, "ITOT")),
-      smoking           = get(paste0("R", w, "SMOKEN")),
-      comorbidity_index = get(paste0("comob_ind_w", w))
+      dlrc = if (w < 14) {
+        .data[[paste0("R", w, "DLRC")]]
+      } else {
+        coalesce(
+          .data[[paste0("R", w, "DLRCP")]],
+          .data[[paste0("R", w, "DLRCW")]]
+        )
+      },
+
+      ser7 = if (w < 14) {
+        .data[[paste0("R", w, "SER7")]]
+      } else {
+        coalesce(
+          .data[[paste0("R", w, "SER7P")]],
+          .data[[paste0("R", w, "SER7W")]]
+        )
+      },
+
+      # COG27(original)
+      cog27 = .data[[paste0("R", w, "COG27")]],
+
+      # Cognition measurement mode
+      cognition_mode = if (w < 14) {
+        case_when(
+          !is.na(.data[[paste0("R", w, "IMRC")]]) |
+            !is.na(.data[[paste0("R", w, "DLRC")]]) |
+            !is.na(.data[[paste0("R", w, "SER7")]]) ~ "FTF/TEL",
+          TRUE ~ NA_character_
+        )
+      } else {
+        case_when(
+          !is.na(.data[[paste0("R", w, "IMRCP")]]) |
+            !is.na(.data[[paste0("R", w, "DLRCP")]]) |
+            !is.na(.data[[paste0("R", w, "SER7P")]]) ~ "FTF/TEL",
+
+          !is.na(.data[[paste0("R", w, "IMRCW")]]) |
+            !is.na(.data[[paste0("R", w, "DLRCW")]]) |
+            !is.na(.data[[paste0("R", w, "SER7W")]]) ~ "Web",
+
+          TRUE ~ NA_character_
+        )
+      },
+
+      # Time-varying confounders
+      age =
+        .data[[paste0("R", w, "AGEY_B")]],
+
+      income =
+        .data[[paste0("H", w, "ITOT")]],
+
+      smoking =
+        .data[[paste0("R", w, "SMOKEN")]],
+
+      hibp =
+        .data[[paste0("R", w, "HIBPE")]],
+
+      diabetes =
+        .data[[paste0("R", w, "DIABE")]],
+
+      cancer =
+        .data[[paste0("R", w, "CANCRE")]],
+
+      lung =
+        .data[[paste0("R", w, "LUNGE")]],
+
+      heart =
+        .data[[paste0("R", w, "HEARTE")]],
+
+      stroke =
+        .data[[paste0("R", w, "STROKE")]],
+
+      psychiatric =
+        .data[[paste0("R", w, "PSYCHE")]],
+
+      arthritis =
+        .data[[paste0("R", w, "ARTHRE")]],
+
+      # Raw interview/vital status
+      iwstat_raw =
+        .data[[paste0("R", w, "IWSTAT")]]
     )
-}) |> 
+}) |>
+  arrange(HHIDPN, wave)
+```
+
+
+
+## Create derived variables
+
+```{r}
+
+# comorbidity index
+comorb_vars <- c(
+  "hibp",
+  "diabetes",
+  "cancer",
+  "lung",
+  "heart",
+  "stroke",
+  "psychiatric",
+  "arthritis"
+)
+
+person_long_all <- person_long_all |>
+  mutate(
+    # Total episodic memory score
+    total_recall = imrc + dlrc,
+
+    # Individual-level housing stress
+    housing_stress_bin_ind = case_when(
+      housing_stress == 1     ~ 0L,
+      housing_stress %in% 2:4 ~ 1L,
+      is.na(housing_stress)   ~ NA_integer_,
+      TRUE                    ~ NA_integer_
+    ),
+
+    # Number of missing comorbidity items
+    n_comorb_missing =
+      rowSums(is.na(pick(all_of(comorb_vars)))),
+
+    # Comorbidity index: defined only if all 8 items are observed
+    comorbidity_index = if_else(
+      n_comorb_missing == 0,
+      rowSums(pick(all_of(comorb_vars))),
+      NA_real_
+    ),
+
+    # Vital/interview status
+    status = classify_iwstat(iwstat_raw),
+
+    # Binary cognitive impairment
+    cognitive_impairment = case_when(
+      is.na(cog27) ~ NA_integer_,
+      cog27 <= 11  ~ 1L,
+      cog27 >= 12  ~ 0L
+    ),
+
+    treatment_wave = wave %in% treatment_waves
+  )
+```
+
+
+
+## Create household-level exposure 
+
+- If one of the members in one household, the household-level exposure : 1
+
+```{r}
+
+# create household-level exposure
+household_exposure <- person_long_all |>
+  filter(
+    wave %in% treatment_waves,
+    !is.na(hhid_wave)
+  ) |>
+  group_by(wave, hhid_wave) |>
+  summarise(
+    n_household_members =
+      n_distinct(HHIDPN),
+
+    n_housing_reports =
+      sum(!is.na(housing_stress_bin_ind)),
+
+    housing_stress_bin_hh = case_when(
+      # No housing-stress report in the household
+      n_housing_reports == 0 ~ NA_integer_,
+
+      # At least one member reports housing stress
+      any(
+        housing_stress_bin_ind == 1L,
+        na.rm = TRUE
+      ) ~ 1L,
+
+      # At least one report, and all observed reports are negative
+      TRUE ~ 0L
+    ),
+
+    .groups = "drop"
+  )
+```
+
+## Define baseline analytic cohort 
+
+```{r}
+
+eligible_ids <- person_long_all |>
+  filter(
+    wave == 8,
+    baseline_memory_disease == 0,
+    !is.na(housing_stress_bin_ind),
+    !is.na(imrc),
+    !is.na(dlrc),
+    !is.na(ser7)
+  ) |>
+  distinct(HHIDPN) |>
+  pull(HHIDPN)
+
+# join household_exposure
+dat_long_combined <- person_long_all |>
+  filter(HHIDPN %in% eligible_ids) |>
+  left_join(
+    household_exposure,
+    by = c("wave", "hhid_wave")
+  ) |>
   arrange(HHIDPN, wave)
 
-# check
-dim(dat_long_combined)  # 23232    20
-n_distinct(dat_long_combined$HHIDPN) # unique individuals: 7744
-n_distinct(dat_long_combined$HHID) # Unique households: 5,206
-
 ```
 
 
-# chekc num of housing stress between waves
+## Recode baseline variables
+
+- factor
+  - sex, race, education
 
 ```{r}
-# check num of housing stress between waves
-## -> too small num of partcipants changing from 1->2~4
-## it might be difficult to chekc fixed effect in categorical housing stress
-dat_long_combined %>%
-  select(HHIDPN, wave, housing_stress) %>%
-  pivot_wider(names_from = wave, values_from = housing_stress, 
-              names_prefix = "w") %>%
-  count(w8, w10, w12) %>%
-  arrange(desc(n)) 
-```
 
-
-## Factor, Binary, Numeric
-
-- Change education category
-
-```{r}
-# housing stress -> dichotomized
-# 0 = No housing problem
-# 1 = Yes, any housing problem (2+3+4)
-dat_long_combined <- dat_long_combined |> 
-  mutate(
-    housing_stress_bin = ifelse(housing_stress == 1, 0, 1)
-    )
-
-# wave -> factor
-dat_long_combined <- dat_long_combined |> 
-  mutate(wave = factor(wave, levels = c(8, 10, 12)))
-
- # sex -> factor
-dat_long_combined <- dat_long_combined |> 
+dat_long_combined <- dat_long_combined |>
   mutate(
     sex = factor(
       sex,
       levels = c(1, 2),
       labels = c("Male", "Female")
-    ))
+    ),
 
-# education -> change category + factor 
-dat_long_combined <- dat_long_combined |>
-  mutate(
-    education = factor(
+    race_ethnicity = factor(
       case_when(
-        education == 1        ~ 1,  # Lt high school
-        education %in% c(2, 3) ~ 2,  # GED + high-school graduate を統合
-        education == 4        ~ 3,  # some college
-        education == 5        ~ 4   # college and above
+        hispanic == 1 ~ "Hispanic",
+        race == 1     ~ "Non-Hispanic White",
+        race == 2     ~ "Non-Hispanic Black",
+        race == 3     ~ "Non-Hispanic Other",
+        TRUE          ~ NA_character_
       ),
-      levels = c(1, 2, 3, 4),
+      levels = c(
+        "Non-Hispanic White",
+        "Non-Hispanic Black",
+        "Hispanic",
+        "Non-Hispanic Other"
+      )
+    ),
+
+    education_cat = factor(
+      case_when(
+        education == 1         ~ 1L,
+        education %in% c(2, 3) ~ 2L,
+        education == 4         ~ 3L,
+        education == 5         ~ 4L,
+        TRUE                   ~ NA_integer_
+      ),
+      levels = 1:4,
       labels = c(
         "Less than high school",
-        "High school and general educational diplomas",
+        "High school or GED",
         "Some college",
         "College and above"
       )
     )
   )
-
-# comorbidity_index, ser7 -> numeric
-dat_long_combined <- dat_long_combined |> 
-  mutate(
-    comorbidity_index = as.numeric(comorbidity_index),
-    ser7 = as.numeric(ser7)
-    )
-
-# number of participants experienced Housing stress more than 1 wave
-dat_long_combined |> 
-  group_by(HHIDPN) |> 
-  summarise(ever_stress = max(housing_stress_bin, na.rm = TRUE)) |> 
-  summarise(n_ever_stress = sum(ever_stress == 1))
-
-# check raw vs binary housing stress
-# correclty converted
-dat_long_combined |> 
-  count(housing_stress, housing_stress_bin)
-
-
-# check
-head(dat_long_combined, 20) |> view()
-names(dat_long_combined)
 ```
 
 
-## Death records
+# create z-scores
 
-- Need to define death and censoring
-
-- using RADDATE(date of death) and IWEND(interview end date), categolized into:
-  - IWEND exist: alive at the wave
-  - RADDATE exist & RADDATE < IWEND at the wave : death at the wave
-  
+- scale(): (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 
 ```{r}
-
-# ── step 1: exact death date and interview date from dat─────────
-person_level <- dat |>
-  select(HHIDPN, RADDATE,
-         R8IWEND,  R10IWEND,  R12IWEND, # respondent
-         S8IWEND,  S10IWEND,  S12IWEND) |> # spouse
-  distinct() |>
-  filter(HHIDPN %in% dat_long_combined$HHIDPN)
-
-
-# ── step 2: combine cols regardless of roles─────────────────
-role_info <- dat_long_combined |>
-  distinct(HHIDPN, role)
-
-person_level <- person_level |>
-  left_join(role_info, by = "HHIDPN") |>
-  mutate(
-    IWEND_w8  = if_else(role == "respondent", R8IWEND,  S8IWEND),
-    IWEND_w10 = if_else(role == "respondent", R10IWEND, S10IWEND),
-    IWEND_w12 = if_else(role == "respondent", R12IWEND, S12IWEND)
-  ) |>
-  mutate(
-    across(c(RADDATE, IWEND_w8, IWEND_w10, IWEND_w12),
-           ~ as.Date(., origin = "1960-01-01"))
-  ) |>
-  mutate(
-    has_death_record = !is.na(RADDATE)
-  )
-
-
-# ── Step 3: define wave base date──────────────────────────
-
-# check num of NA for interview dates at waves
-person_level |>
-  summarise(
-    na_IWEND_w8  = sum(is.na(IWEND_w8)),
-    na_IWEND_w10 = sum(is.na(IWEND_w10)),
-    na_IWEND_w12 = sum(is.na(IWEND_w12))
-  )
-
-# NA in interview dates -> median
-wave_ref <- person_level |>
-  mutate(
-    ref_w8  = coalesce(IWEND_w8,  as.Date("2006-09-01")),
-    ref_w10 = coalesce(IWEND_w10, as.Date("2010-09-01")),
-    ref_w12 = coalesce(IWEND_w12, as.Date("2014-09-01"))
-  )
-
-
-# ── step 4:  status(alive / dead / dropout) at each wave────────
-status <- wave_ref |>
-  mutate(
-    # Wave 8
-    status_w8 = case_when(
-      has_death_record & RADDATE < ref_w8 ~ "dead",
-      !is.na(IWEND_w8)                    ~ "alive",
-      TRUE                                ~ "censored"
-    ),
-    # Wave 10
-    status_w10 = case_when(
-      status_w8 == "dead"                  ~ "dead",
-      has_death_record & RADDATE < ref_w10 ~ "dead",
-      !is.na(IWEND_w10)                    ~ "alive",
-      TRUE                                 ~ "censored"
-    ),
-    # Wave 12
-    status_w12 = case_when(
-      status_w10 == "dead"                 ~ "dead",
-      has_death_record & RADDATE < ref_w12 ~ "dead",
-      !is.na(IWEND_w12)                    ~ "alive",
-      TRUE                                 ~ "censored"
-    )
-  ) |>
-  select(HHIDPN, has_death_record,
-         status_w8, status_w10, status_w12)
-
-
-# ── Step 5: check────────────────────
-status |> count(status_w8) # alive      7744
-status |> count(status_w10) # dead: 776, censored: 457
-status |> count(status_w12) # dead: 1684, censored: 669
-
-# check: no one dead at wave 8: 0
-status |> filter(status_w8 == "dead") #0
-
-# check: alive -> alive（dead -> alive=0）
-status |>
-  filter(status_w10 == "alive" & status_w8 == "dead") #0
-
-
-# -- Step 6: merge into dat_long_combined----------------
 dat_long_combined <- dat_long_combined |>
-  left_join(
-    status |>
-      pivot_longer(
-        cols      = starts_with("status_w"),
-        names_to  = "wave_label",
-        values_to = "status"
-      ) |>
-      mutate(wave = factor(str_extract(wave_label, "\\d+"),
-                           levels = c("8", "10", "12"))) |> 
-      select(-wave_label),
-    by = c("HHIDPN", "wave")
-  )
+  group_by(wave) |>
+  mutate(
+    total_recall_z =
+      as.numeric(scale(total_recall)),
 
-# check status count
+    ser7_z =
+      as.numeric(scale(ser7))
+  ) |>
+  ungroup()
+
+# check distribution
 dat_long_combined |>
-  group_by(wave, status) |>
-  count()
-
-# check status NA
-dat_long_combined |>
-  summarise(na_status = sum(is.na(status))) # 0
-
-dat_long_combined |> dim() # 23232    21
-dat_long_combined$HHIDPN |> n_distinct() # 7744
-
-
-# step 7: merge into wide format--------------------------------
-
-dat_wide_combined <- dat_wide_combined |>
-  left_join(
-    status |> select(HHIDPN, status_w8, status_w10, status_w12),
-    by = "HHIDPN"
-  )
-
-# check
-nrow(dat_wide_combined)  # 7744
-
-dat_wide_combined |>
+  group_by(wave) |>
   summarise(
-    na_status_w8  = sum(is.na(status_w8)), # 0
-    na_status_w10 = sum(is.na(status_w10)), # 0
-    na_status_w12 = sum(is.na(status_w12)) # 0
-  )  
+    mean_total_recall_z = mean(total_recall_z, na.rm = TRUE),
+    sd_total_recall_z   = sd(total_recall_z, na.rm = TRUE),
+    mean_ser7_z         = mean(ser7_z, na.rm = TRUE),
+    sd_ser7_z           = sd(ser7_z, na.rm = TRUE),
+    .groups = "drop"
+  )
 
+dat_long_combined |>
+  group_by(wave) |>
+  summarise(
+    n_total_recall     = sum(!is.na(total_recall)),
+    n_total_recall_z   = sum(!is.na(total_recall_z)),
+    n_ser7             = sum(!is.na(ser7)),
+    n_ser7_z           = sum(!is.na(ser7_z)),
+    .groups = "drop"
+  ) 
 ```
 
 
-## Save data
+## Checks 
+
 
 ```{r}
-getwd()
 
-saveRDS(dat_wide_combined, "dat_wide_combined.rds")
-saveRDS(dat_long_combined,  "dat_long_combined.rds")
+# One row per person per wave
+stopifnot(
+  !anyDuplicated(
+    dat_long_combined[c("HHIDPN", "wave")]
+  )
+)
+
+# Every participant should have four rows
+dat_long_combined |>
+  count(HHIDPN) |>
+  count(n)
+
+stopifnot(
+  nrow(dat_long_combined) ==
+    n_distinct(dat_long_combined$HHIDPN) * 4
+)
+
+# Baseline status
+dat_long_combined |>
+  filter(wave == 8) |>
+  count(status)
+
+# Status by wave
+dat_long_combined |>
+  count(wave, status)
+
+# Household exposure must be identical within household-wave
+dat_long_combined |>
+  filter(
+    treatment_wave,
+    !is.na(hhid_wave)
+  ) |>
+  group_by(wave, hhid_wave) |>
+  summarise(
+    n_exposure_values =
+      n_distinct(
+        housing_stress_bin_hh,
+        na.rm = TRUE
+      ),
+    .groups = "drop"
+  ) |>
+  filter(n_exposure_values > 1)
+
+# num of cupples
+dat_long_combined |>
+  filter(wave == 8) |>
+  count(cluster_id, name = "n_people") |>
+  count(n_people)
+
+
+# chcke NA in cluster_id: 0
+dat_long_combined |>
+  filter(wave == 8) |>
+  summarise(
+    n = n(),
+    n_missing_cluster_id = sum(is.na(cluster_id)),
+    n_missing_hhid_wave  = sum(is.na(hhid_wave)),
+    n_clusters = n_distinct(cluster_id, na.rm = TRUE)
+  )
+
+```
+
+## check flowchart
+
+```{r}
+
+# One row per person at Wave 8
+baseline_flow <- person_long_all |>
+  filter(wave == 8) |>
+  distinct(HHIDPN, .keep_all = TRUE)
+
+# Step 0: all RAND HRS participants
+flow_0 <- dat |>
+  distinct(HHIDPN)
+
+# Step 1: interviewed at Wave 8
+flow_1 <- baseline_flow |>
+  filter(iwstat_raw == 1)
+
+# Step 2: no doctor-diagnosed memory-related disease at Wave 8
+flow_2 <- flow_1 |>
+  filter(baseline_memory_disease == 0)
+
+# Step 3: baseline housing-stress data observed
+flow_3 <- flow_2 |>
+  filter(!is.na(housing_stress_bin_ind))
+
+# Step 4: all baseline primary cognitive outcomes observed
+flow_4 <- flow_3 |>
+  filter(
+    !is.na(imrc),
+    !is.na(dlrc),
+    !is.na(ser7)
+  )
+
+flow_counts <- tibble(
+  stage = c(
+    "All participants",
+    "Wave 8 respondents",
+    "No baseline memory-related disease",
+    "Baseline housing-stress data observed",
+    "Final analytic sample"
+  ),
+  n_remaining = c(
+    n_distinct(flow_0$HHIDPN),
+    n_distinct(flow_1$HHIDPN),
+    n_distinct(flow_2$HHIDPN),
+    n_distinct(flow_3$HHIDPN),
+    n_distinct(flow_4$HHIDPN)
+  )
+) |>
+  mutate(
+    n_excluded = lag(n_remaining) - n_remaining
+  )
+
+flow_counts
+```
+
+## Save 
+
+```{r}
+
+saveRDS(
+  dat_long_combined,
+  "dat_long_combined.rds"
+)
+
 ```
